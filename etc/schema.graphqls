@@ -1,0 +1,77 @@
+type Query {
+    simiproducts (
+        search: String @doc(description: "Performs a full-text search using the specified key words."),
+        filter: ProductFilterInput @doc(description: "Identifies which product attributes to search for and return."),
+        simiFilter: String @doc(description: "Simiconnector filter."),
+        pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once. This attribute is optional."),
+        currentPage: Int = 1 @doc(description: "Specifies which page of results to return. The default value is 1."),
+        sort: ProductSortInput @doc(description: "Specifies which attribute to sort on, and whether to return the results in ascending or descending order."),
+        simiProductSort: SimiProductSort @doc(description: "SimiProductSort.")
+     ): Simiproducts
+    @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simiproducts") @doc(description: "The products query searches for products that match the criteria specified in the search and filter attributes")
+    simiStoreConfig(
+        storeId: Int @doc(description: "Change store view id"),
+        currency: String @doc(description: "Change currency")
+     ): SimiStoreConfig @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simistoreconfigresolver") @doc(description: "The store config query")
+    simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details")
+}
+
+type Mutation {
+    subscribe(email: String!): Subscribe @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Subscribe") @doc(description: "Subscribe email to magento subscribed list for guest.")
+}
+
+type Simiproducts @doc(description: "The Products object is the top-level object returned in a product search") {
+    items: [ProductInterface] @doc(description: "An array of products that match the specified search criteria")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query")
+    total_count: Int @doc(description: "The number of products returned")
+    filters: [LayerFilter] @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\LayerFilters") @doc(description: "Layered navigation filters array")
+    sort_fields: SortFields @doc(description: "An object that includes the default sort field and all available sort fields") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Category\\SortFields")
+    simi_filters: [SimiLayerFilter] @doc(description: "Simi Filter options")
+    maxPrice: Float @doc(description: "Max price Before filtering")
+    minPrice: Float @doc(description: "Min price Before filtering")
+}
+
+interface ProductInterface {
+    simiExtraField: String @doc(description: "Simicart Product Extra Fields")
+}
+
+interface CategoryInterface {
+    simiCategoryCms: SimiCategoryCms  @doc(description: "Get Cms Config For Category") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiCategoryCms")
+}
+
+type SimiLayerFilter {
+    name: String @doc(description: "Layered navigation filter name")
+    request_var: String @doc(description: "Request variable name for filter query")
+    filter_items_count: Int @doc(description: "Count of filter items in filter group")
+    filter_items: [SimiLayerFilterItem] @doc(description: "Array of filter items")
+}
+
+type SimiLayerFilterItem {
+    label: String @doc(description: "Filter label")
+    value_string: String @doc(description: "Value for filter request variable to be used in query")
+    items_count: Int @doc(description: "Count of items by filter")
+}
+
+type SimiStoreConfig {
+    store_id: String @doc(description: "Current store Id")
+    currency: String @doc(description: "Current currency")
+    pwa_studio_client_ver_number: String @doc(description: "Client PWA Studio version number")
+    root_category_id: Int @doc(description: "Root Category Id of storeview")
+    config_json: String @doc(description: "Simiconnector store configuration values")
+}
+
+type SimiCategoryCms {
+    display_mode: String @doc(description: "Category Display Mode")
+    cms_identifier: String @doc(description: "Cms block identifier")
+    cms: String @doc(description: "Cms block")
+}
+
+type Subscribe {
+    status: String
+    message: String
+}
+
+input SimiProductSort @doc(description:"Input SimiProductSort") {
+    attribute: String
+    direction: String
+}
