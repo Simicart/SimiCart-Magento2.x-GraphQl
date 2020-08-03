@@ -7,13 +7,13 @@ declare(strict_types=1);
 
 namespace Simi\SimiconnectorGraphQl\Model\Resolver\Products\Query;
 
-use Simi\SimiconnectorGraphQl\Model\Resolver\Products\DataProvider\ProductSearch;
-use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
-use Magento\Framework\Api\Search\SearchCriteriaInterface;
-use Magento\CatalogGraphQl\Model\Resolver\Products\SearchResult;
-use Magento\CatalogGraphQl\Model\Resolver\Products\SearchResultFactory;
-use Magento\Search\Api\SearchInterface;
-use Magento\Framework\Api\Search\SearchCriteriaInterfaceFactory;
+use \Simi\SimiconnectorGraphQl\Model\Resolver\Products\DataProvider\ProductSearch;
+use \Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use \Magento\Framework\Api\Search\SearchCriteriaInterface;
+use \Magento\CatalogGraphQl\Model\Resolver\Products\SearchResult;
+use \Magento\CatalogGraphQl\Model\Resolver\Products\SearchResultFactory;
+use \Magento\Search\Api\SearchInterface;
+use \Magento\Framework\Api\Search\SearchCriteriaInterfaceFactory;
 
 /**
  * Full text search for catalog using given search criteria.

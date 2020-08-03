@@ -44,7 +44,7 @@ class SimiRootCate implements ResolverInterface
         \Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\CategoryTree $categoryTree,
         ExtractDataFromCategoryTree $extractDataFromCategoryTree,
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->categoryTree = $categoryTree;
         $this->extractDataFromCategoryTree = $extractDataFromCategoryTree;

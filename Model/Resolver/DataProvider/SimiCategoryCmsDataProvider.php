@@ -24,9 +24,9 @@ class SimiCategoryCmsDataProvider extends DataProviderInterface
 
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
-        Magento\Framework\View\LayoutInterface $simiLayout,
-        Magento\Catalog\Model\CategoryFactory $categoryFactory,
-        Magento\Cms\Model\BlockFactory $blockFactory
+        \Magento\Framework\View\LayoutInterface $simiLayout,
+        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        \Magento\Cms\Model\BlockFactory $blockFactory
     ) {
         $this->simiObjectManager = $simiObjectManager;
         $this->simiLayout = $simiLayout;

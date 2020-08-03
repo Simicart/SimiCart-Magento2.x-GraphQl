@@ -72,11 +72,11 @@ class ProductSearch
         SearchResultApplierFactory $searchResultsApplierFactory,
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
         \Simi\Simiconnector\Helper\Products $simiProductHelper,
-        Magento\Catalog\Model\CategoryFactory $categoryFactory,
-        Magento\Catalog\Model\ProductFactory $productFactory,
-        Magento\Framework\App\ResourceConnection $resourceConnection,
-        Magento\Store\Model\StoreManagerInterface $storeManager,
-        Magento\Framework\Registry $registry
+        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        \Magento\Catalog\Model\ProductFactory $productFactory,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Registry $registry
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;

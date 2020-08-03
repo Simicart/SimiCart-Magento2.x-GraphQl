@@ -26,9 +26,9 @@ class Simistoreconfigdataprovider extends DataProviderInterface
     public $appScopeConfigInterface;
 
     public function __construct(
-        Simi\Simiconnector\Model\Api\Storeviews $simiStoreviewApi,
-        Magento\Store\Model\StoreManagerInterface $storeManager,
-        Magento\Checkout\Model\Session $checkoutSession,
+        \Simi\Simiconnector\Model\Api\Storeviews $simiStoreviewApi,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         ScopeConfigInterface $appScopeConfigInterface
     ) {

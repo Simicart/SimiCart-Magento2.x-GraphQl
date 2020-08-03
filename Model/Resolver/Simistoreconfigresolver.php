@@ -10,7 +10,7 @@ namespace Simi\SimiconnectorGraphQl\Model\Resolver;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
-use Simi\SimiconnectorGraphQl\Model\Resolver\DataProvider\Simistoreconfigdataprovider;
+use \Simi\SimiconnectorGraphQl\Model\Resolver\DataProvider\Simistoreconfigdataprovider;
 
 /**
  * StoreConfig page field resolver, used for GraphQL request processing.

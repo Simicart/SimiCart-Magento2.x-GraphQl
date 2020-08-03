@@ -71,14 +71,14 @@ class Simiproducts implements ResolverInterface
         Filter $filterQuery,
         SearchFilter $searchFilter,
         SearchCriteriaBuilder $searchApiCriteriaBuilder = null,
-        Magento\Framework\Registry $registry,
+        \Magento\Framework\Registry $registry,
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Simi\Simiconnector\Helper\Options $simiOptionHelper,
         \Simi\Simiconnector\Helper\Review $simiReviewHelper,
         \Simi\Simiconnector\Helper\Price $simiPriceHelper,
-        Magento\Framework\View\LayoutInterface $simiLayout
+        \Magento\Framework\View\LayoutInterface $simiLayout
     ) {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->searchQuery = $searchQuery;
