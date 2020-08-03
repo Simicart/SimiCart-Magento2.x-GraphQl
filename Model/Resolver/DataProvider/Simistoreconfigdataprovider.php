@@ -17,17 +17,39 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class Simistoreconfigdataprovider extends DataProviderInterface
 {
+
+
+    public $simiStoreviewApi;
+    public $storeManager;
+    public $checkoutSession;
+    public $quoteFactory;
+    public $appScopeConfigInterface;
+
+    public function __construct(
+        Simi\Simiconnector\Model\Api\Storeviews $simiStoreviewApi,
+        Magento\Store\Model\StoreManagerInterface $storeManager,
+        Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        ScopeConfigInterface $appScopeConfigInterface
+    ) {
+        $this->storeManager = $storeManager;
+        $this->simiStoreviewApi = $simiStoreviewApi;
+        $this->checkoutSession = $checkoutSession;
+        $this->quoteFactory = $quoteFactory;
+        $this->appScopeConfigInterface = $appScopeConfigInterface;
+    }
+
     /**
      * Get store config data
      *
      * @return array
      */
     public function getSimiStoreConfigData($args){
-        $storeApi = $this->simiObjectManager->get('Simi\Simiconnector\Model\Api\Storeviews');
-        $storeManager = $this->simiObjectManager->get('\Magento\Store\Model\StoreManagerInterface');
-        $quoteId = $this->simiObjectManager->get('Magento\Checkout\Model\Session')->getQuoteId();
+        $storeApi = $this->simiStoreviewApi;
+        $storeManager = $this->simiStoreviewApi;
+        $quoteId = $this->checkoutSession->getQuoteId();
         if ($quoteId) {
-            $quoteModel = $this->simiObjectManager->create('\Magento\Quote\Model\Quote')->load($quoteId);
+            $quoteModel = $this->quoteFactory->create()->load($quoteId);
             if ($quoteModel->getId()) {
                 $storeId = $storeManager->getStore()->getId();
                 $currencyCode   = $this->storeManager->getStore()->getCurrentCurrencyCode();
@@ -56,8 +78,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
             'store_id' => (int)$storeManager->getStore()->getId(),
             'currency' => $storeManager->getStore()->getCurrentCurrencyCode(),
             'root_category_id' => (int)$storeManager->getStore()->getRootCategoryId(),
-            'pwa_studio_client_ver_number' => $this->simiObjectManager
-                ->get('\Magento\Framework\App\Config\ScopeConfigInterface')
+            'pwa_studio_client_ver_number' => $this->appScopeConfigInterface
                 ->getValue('simiconnector/general/pwa_studio_client_ver_number'),
             'config_json' => json_encode($storeApi->show()),
         );

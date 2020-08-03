@@ -17,6 +17,22 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class SimiCategoryCmsDataProvider extends DataProviderInterface
 {
+    public $simiObjectManager;
+    public $simiLayout;
+    public $categoryFactory;
+    public $blockFactory;
+
+    public function __construct(
+        \Magento\Framework\ObjectManagerInterface $simiObjectManager,
+        Magento\Framework\View\LayoutInterface $simiLayout,
+        Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        Magento\Cms\Model\BlockFactory $blockFactory
+    ) {
+        $this->simiObjectManager = $simiObjectManager;
+        $this->simiLayout = $simiLayout;
+        $this->categoryFactory = $categoryFactory;
+        $this->blockFactory = $blockFactory;
+    }
     /**
      * Get store config data
      *
@@ -30,16 +46,16 @@ class SimiCategoryCmsDataProvider extends DataProviderInterface
             $categoryId = $catId;
         }
 
-        $model = $this->simiObjectManager->create('\Magento\Catalog\Model\Category');
+        $model = $this->categoryFactory->create();
         $category = $model->load($categoryId);
         $displayMode = $category->getDisplayMode();
         $landingPage = $category->getlandingPage();
         $cmsIdentifer = '';
         $cms = '';
         if($landingPage) {
-            $blockModel = $this->simiObjectManager->create('Magento\Cms\Model\Block')->load($landingPage);
+            $blockModel = $this->blockFactory->create()->load($landingPage);
             $cmsIdentifer = $blockModel->getIdentifier();
-            $block = $this->simiObjectManager->get('Magento\Framework\View\LayoutInterface')
+            $block = $this->simiLayout
                 ->createBlock('Magento\Cms\Block\Block');
             $block->setBlockId($category['landing_page']);
             $cms = $block->toHtml();

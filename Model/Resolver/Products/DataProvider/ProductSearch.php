@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Simi\SimiconnectorGraphQl\Model\Resolver234\Products\DataProvider;
+namespace Simi\SimiconnectorGraphQl\Model\Resolver\Products\DataProvider;
 
 use Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\Product\CollectionPostProcessor;
 use Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\SearchResultApplierFactory;
@@ -49,6 +49,14 @@ class ProductSearch
      */
     private $searchResultApplierFactory;
 
+    public $simiObjectManager;
+    public $simiProductHelper;
+    public $categoryFactory;
+    public $productFactory;
+    public $resourceConnection;
+    public $storeManager;
+    public $registry;
+
     /**
      * @param CollectionFactory $collectionFactory
      * @param ProductSearchResultsInterfaceFactory $searchResultsFactory
@@ -61,13 +69,26 @@ class ProductSearch
         ProductSearchResultsInterfaceFactory $searchResultsFactory,
         CollectionProcessorInterface $collectionPreProcessor,
         CollectionPostProcessor $collectionPostProcessor,
-        SearchResultApplierFactory $searchResultsApplierFactory
+        SearchResultApplierFactory $searchResultsApplierFactory,
+        \Magento\Framework\ObjectManagerInterface $simiObjectManager,
+        \Simi\Simiconnector\Helper\Products $simiProductHelper,
+        Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        Magento\Catalog\Model\ProductFactory $productFactory,
+        Magento\Framework\App\ResourceConnection $resourceConnection,
+        Magento\Store\Model\StoreManagerInterface $storeManager,
+        Magento\Framework\Registry $registry
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->collectionPreProcessor = $collectionPreProcessor;
         $this->collectionPostProcessor = $collectionPostProcessor;
         $this->searchResultApplierFactory = $searchResultsApplierFactory;
+        $this->simiProductHelper = $simiProductHelper;
+        $this->categoryFactory = $categoryFactory;
+        $this->productFactory = $productFactory;
+        $this->resourceConnection = $resourceConnection;
+        $this->storeManager = $storeManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -98,8 +119,7 @@ class ProductSearch
          * simiconnector changing
         */
         $collection = null;
-        $this->simiObjectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $helper = $this->simiObjectManager->get('Simi\Simiconnector\Helper\Products');
+        $helper = $this->simiProductHelper;
         $params = array(
             'filter' => array()
         );
@@ -120,13 +140,13 @@ class ProductSearch
         }
         //filter by category
         if ($args && isset($args['filter']['category_id']['eq'])) {
-            $category = $this->simiObjectManager->create('\Magento\Catalog\Model\Category')
+            $category = $this->categoryFactory->create()
                 ->load($args['filter']['category_id']['eq']);
             $collection = $category->getProductCollection();
             $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH)));
         } else if (!$is_search || !$collection) {
-            $category = $this->simiObjectManager->create('\Magento\Catalog\Model\Category')
-                ->load($this->simiObjectManager->get('\Magento\Store\Model\StoreManagerInterface')->getStore()->getRootCategoryId());
+            $category = $this->categoryFactory->create()
+                ->load($this->storeManager->getStore()->getRootCategoryId());
             $collection = $category->getProductCollection();
             $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH)));
         }
@@ -134,7 +154,7 @@ class ProductSearch
 
         $collection->addAttributeToSelect('*')->addFinalPrice();
         //get min and max price before filtering
-        $registry = $this->simiObjectManager->get('\Magento\Framework\Registry');
+        $registry = $this->registry;
         $registry->register('simi_min_price', $collection->getMinPrice());
         $registry->register('simi_max_price', $collection->getMaxPrice());
 
@@ -183,7 +203,7 @@ class ProductSearch
             }
 
             if (count($simiFilterOptions)) {
-                $registry = $this->simiObjectManager->get('\Magento\Framework\Registry');
+                $registry = $this->registry;
                 $registry->register('simiProductFilters', json_encode($simiFilterOptions));
             }
         }
@@ -215,7 +235,7 @@ class ProductSearch
 
         $items = array();
         foreach ($collection->getData() as $index => $product) {
-            $items[(int)$product['entity_id']] = $this->simiObjectManager->create('Magento\Catalog\Model\Product')
+            $items[(int)$product['entity_id']] = $this->productFactory->create()
                 ->load($product['entity_id']);
         }
 
@@ -227,7 +247,7 @@ class ProductSearch
     }
 
     public function applySimiViewCountSort($collection, $dir) {
-        $resource = $this->simiObjectManager->create('\Magento\Framework\App\ResourceConnection');
+        $resource = $this->resourceConnection;
         $reportEventTable = $collection->getResource()->getTable('report_event');
         $conn = $resource->getConnection('catalog');
         $subSelect = $conn->select()->from(
@@ -249,7 +269,7 @@ class ProductSearch
 			'entity_pk_value=entity_id',
 			array(
 				'entity_type' => 1,
-				'store_id'    => $this->simiObjectManager->get( '\Magento\Store\Model\StoreManagerInterface' )->getStore()->getId()
+				'store_id'    => $this->storeManager->getStore()->getId()
 			),
 			'left'
 		);

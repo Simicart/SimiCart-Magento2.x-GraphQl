@@ -55,19 +55,30 @@ class Simiproducts implements ResolverInterface
     public $productExtraData;
     public $currentProductModel;
 
-    /**
-     * @param Builder $searchCriteriaBuilder
-     * @param Search $searchQuery
-     * @param Filter $filterQuery
-     * @param SearchFilter $searchFilter
-     * @param SearchCriteriaBuilder|null $searchApiCriteriaBuilder
-     */
+
+    public $registry;
+    public $simiObjectManager;
+    public $eventManager;
+    public $scopeConfig;
+    public $simiOptionHelper;
+    public $simiReviewHelper;
+    public $simiPriceHelper;
+    public $simiLayout;
+
     public function __construct(
         Builder $searchCriteriaBuilder,
         Search $searchQuery,
         Filter $filterQuery,
         SearchFilter $searchFilter,
-        SearchCriteriaBuilder $searchApiCriteriaBuilder = null
+        SearchCriteriaBuilder $searchApiCriteriaBuilder = null,
+        Magento\Framework\Registry $registry,
+        \Magento\Framework\ObjectManagerInterface $simiObjectManager,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Simi\Simiconnector\Helper\Options $simiOptionHelper,
+        \Simi\Simiconnector\Helper\Review $simiReviewHelper,
+        \Simi\Simiconnector\Helper\Price $simiPriceHelper,
+        Magento\Framework\View\LayoutInterface $simiLayout
     ) {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->searchQuery = $searchQuery;
@@ -75,6 +86,15 @@ class Simiproducts implements ResolverInterface
         $this->searchFilter = $searchFilter;
         $this->searchApiCriteriaBuilder = $searchApiCriteriaBuilder ??
             \Magento\Framework\App\ObjectManager::getInstance()->get(SearchCriteriaBuilder::class);
+
+        $this->registry = $registry;
+        $this->simiObjectManager = $simiObjectManager;
+        $this->eventManager = $eventManager;
+        $this->scopeConfig = $scopeConfig;
+        $this->simiOptionHelper = $simiOptionHelper;
+        $this->simiReviewHelper = $simiReviewHelper;
+        $this->simiPriceHelper = $simiPriceHelper;
+        $this->simiLayout = $simiLayout;
     }
 
     /**
@@ -116,14 +136,11 @@ class Simiproducts implements ResolverInterface
 
 
         //simiconnector changing
-        $this->simiObjectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $registry = $this->simiObjectManager->get('\Magento\Framework\Registry');
+        $registry = $this->registry;
         $simiProductFilters = $registry->registry('simiProductFilters');
-        $this->eventManager = $this->simiObjectManager->get('\Magento\Framework\Event\ManagerInterface');
 
         $products = $searchResult->getProductsSearchResult();
-        $isShowOptionsInListing = $this->simiObjectManager
-            ->get('Magento\Framework\App\Config\ScopeConfigInterface')
+        $isShowOptionsInListing = $this->scopeConfig
             ->getValue('siminiaconfig/compareconfig/show_size_in_compare');
         foreach ($products as $index => $product) {
             $productModel = $product['model'];
@@ -134,14 +151,12 @@ class Simiproducts implements ResolverInterface
                         unset($attributes['description']);
                     $options = null;
                     if($isShowOptionsInListing){
-                        $options = $this->simiObjectManager
-                            ->get('\Simi\Simiconnector\Helper\Options')->getOptions($productModel);
+                        $options = $this->simiOptionHelper->getOptions($productModel);
                     }
                     $this->productExtraData = array(
                         'attribute_values' => $attributes,
                         'app_options' => $options,
-                        'app_reviews' => $this->simiObjectManager
-                            ->get('\Simi\Simiconnector\Helper\Review')
+                        'app_reviews' => $this->simiReviewHelper
                             ->getProductReviews($productModel->getId())
                     );
                     $this->currentProductModel = $productModel;
@@ -152,24 +167,21 @@ class Simiproducts implements ResolverInterface
                     $product['simiExtraField'] = json_encode($this->productExtraData);
                     $products[$index] = $product;
                 } else { //details
-                    $registry = $this->simiObjectManager->get('\Magento\Framework\Registry');
+                    $registry = $this->registry;
                     if (!$registry->registry('product') && $productModel->getId()) {
                         $registry->register('product', $productModel);
                         $registry->register('current_product', $productModel);
                     }
-                    $options = $this->simiObjectManager
-                        ->get('\Simi\Simiconnector\Helper\Options')->getOptions($productModel);
+                    $options = $this->simiOptionHelper->getOptions($productModel);
 
-                    $app_reviews  = $this->simiObjectManager
-                        ->get('\Simi\Simiconnector\Helper\Review')
+                    $app_reviews  = $this->simiReviewHelper
                         ->getProductReviews($productModel->getId());
 
-                    $layout      = $this->simiObjectManager->get('Magento\Framework\View\LayoutInterface');
+                    $layout      = $this->simiLayout;
                     $block_att   = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
                     $_additional = $block_att->getAdditionalData();
 
-                    $tierPrice   = $this->simiObjectManager
-                        ->get('\Simi\Simiconnector\Helper\Price')->getProductTierPricesLabel($productModel);
+                    $tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);
 
                     $this->extraFields = array(
                         'attribute_values' => $productModel->toArray(),
@@ -179,7 +191,6 @@ class Simiproducts implements ResolverInterface
                         'app_tier_prices' => $tierPrice,
                     );
                     $this->currentProductModel = $productModel;
-                    $this->eventManager = $this->simiObjectManager->get('\Magento\Framework\Event\ManagerInterface');
                     $this->eventManager->dispatch(
                         'simi_simiconnector_graphql_product_detail_extra_field_after',
                         ['object' => $this, 'data' => $this->extraFields]

@@ -33,6 +33,8 @@ class SimiRootCate implements ResolverInterface
      * @var ExtractDataFromCategoryTree
      */
     private $extractDataFromCategoryTree;
+    private $storeManager;
+
 
     /**
      * @param \Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\CategoryTree $categoryTree
@@ -41,11 +43,13 @@ class SimiRootCate implements ResolverInterface
     public function __construct(
         \Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\CategoryTree $categoryTree,
         ExtractDataFromCategoryTree $extractDataFromCategoryTree,
-        \Magento\Framework\ObjectManagerInterface $simiObjectManager
+        \Magento\Framework\ObjectManagerInterface $simiObjectManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
     ) {
         $this->categoryTree = $categoryTree;
         $this->extractDataFromCategoryTree = $extractDataFromCategoryTree;
         $this->simiObjectManager = $simiObjectManager;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -57,7 +61,7 @@ class SimiRootCate implements ResolverInterface
             return $value[$field->getName()];
         }
 
-        $storeManager = $this->simiObjectManager->get('\Magento\Store\Model\StoreManagerInterface');
+        $storeManager = $this->storeManager;
         $rootCategoryId = (int)$storeManager->getStore()->getRootCategoryId();
         $categoriesTree = $this->categoryTree->getTree($info, $rootCategoryId);
 

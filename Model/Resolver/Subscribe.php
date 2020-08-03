@@ -42,6 +42,8 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
      */
     protected $_customerUrl;
 
+    public $scopeConfig;
+
     /**
      * Initialize dependencies.
      *
@@ -59,15 +61,18 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
         StoreManagerInterface $storeManager,
         CustomerUrl $customerUrl,
         CustomerAccountManagement $customerAccountManagement,
-        EmailValidator $emailValidator = null
+        EmailValidator $emailValidator = null,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
+        ScopeConfigInterface $scopeConfig
     ) {
-        $this->_objectManager = ObjectManager::getInstance();
+        $this->_objectManager = $objectManager;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->emailValidator = $emailValidator ?: ObjectManager::getInstance()->get(EmailValidator::class);
         $this->_customerSession = $customerSession;
         $this->_customerUrl = $customerUrl;
         $this->_storeManager = $storeManager;
         $this->_subscriberFactory = $subscriberFactory;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -141,7 +146,7 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
      */
     protected function validateGuestSubscription()
     {
-        if ($this->_objectManager->get(ScopeConfigInterface::class)
+        if ($this->scopeConfig
                 ->getValue(
                     Subscriber::XML_PATH_ALLOW_GUEST_SUBSCRIBE_FLAG,
                     ScopeInterface::SCOPE_STORE
