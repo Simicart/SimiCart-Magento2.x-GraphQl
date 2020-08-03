@@ -46,7 +46,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
      */
     public function getSimiStoreConfigData($args){
         $storeApi = $this->simiStoreviewApi;
-        $storeManager = $this->simiStoreviewApi;
+        $storeManager = $this->storeManager;
         $quoteId = $this->checkoutSession->getQuoteId();
         if ($quoteId) {
             $quoteModel = $this->quoteFactory->create()->load($quoteId);
