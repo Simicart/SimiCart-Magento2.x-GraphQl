@@ -19,6 +19,8 @@ type Query {
 type Mutation {
     subscribe(email: String!): Subscribe @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Subscribe") @doc(description: "Subscribe email to magento subscribed list for guest.")
     wishlist(product: Int!, data: String): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistResolver") @doc(description: "Add wishlist item to customer's wishlist.")
+    wishlistToCart(item_id: Int!, cart_id: String!): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistToCartResolver") @doc(description: "Add wishlist item to cart.")
+    wishlistRemoveItem(item_id: Int!): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistRemoveItemResolver") @doc(description: "Remove wishlist item from customer's wishlist.")
 }
 
 type Simiproducts @doc(description: "The Products object is the top-level object returned in a product search") {
