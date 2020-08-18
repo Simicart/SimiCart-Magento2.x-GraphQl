@@ -205,9 +205,9 @@ class Simiproducts implements ResolverInterface
             'total_count' => $searchResult->getTotalCount(),
             'items' => $products,
             'page_info' => [
-                'page_size' => $searchCriteria->getPageSize(),
-                'current_page' => $searchResult->getCurrentPage(),
-                'page_size' => $searchResult->getPageSize(),
+	            'page_size' => $searchResult->getPageSize(),
+	            'current_page' => $searchResult->getCurrentPage(),
+	            'total_pages' => $searchResult->getTotalPages()
             ],
             'search_result' => $searchResult,
             'layer_type' => isset($args['search']) ? Resolver::CATALOG_LAYER_SEARCH : Resolver::CATALOG_LAYER_CATEGORY,
