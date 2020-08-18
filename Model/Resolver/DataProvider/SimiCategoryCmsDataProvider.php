@@ -17,53 +17,55 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class SimiCategoryCmsDataProvider extends DataProviderInterface
 {
-    public $simiObjectManager;
-    public $simiLayout;
-    public $categoryFactory;
-    public $blockFactory;
+	public $simiObjectManager;
+	public $simiLayout;
+	public $categoryFactory;
+	public $blockFactory;
+	public $storeManager;
 
-    public function __construct(
-        \Magento\Framework\ObjectManagerInterface $simiObjectManager,
-        \Magento\Framework\View\LayoutInterface $simiLayout,
-        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
-        \Magento\Cms\Model\BlockFactory $blockFactory
-    ) {
-        $this->simiObjectManager = $simiObjectManager;
-        $this->simiLayout = $simiLayout;
-        $this->categoryFactory = $categoryFactory;
-        $this->blockFactory = $blockFactory;
-    }
-    /**
-     * Get store config data
-     *
-     * @return array
-     */
-    public function getCategoryCms($catId){
+	public function __construct(
+		\Magento\Framework\ObjectManagerInterface $simiObjectManager,
+		\Magento\Framework\View\LayoutInterface $simiLayout,
+		\Magento\Catalog\Model\CategoryFactory $categoryFactory,
+		\Magento\Cms\Model\BlockFactory $blockFactory,
+		\Magento\Store\Model\StoreManagerInterface $storeManager
+	) {
+		$this->simiObjectManager = $simiObjectManager;
+		$this->simiLayout = $simiLayout;
+		$this->categoryFactory = $categoryFactory;
+		$this->blockFactory = $blockFactory;
+		$this->storeManager = $storeManager;
+	}
+	/**
+	 * Get store config data
+	 *
+	 * @return array
+	 */
+	public function getCategoryCms($catId){
+		$categoryId = $this->storeManager->getStore()->getRootCategoryId();
 
-        $categoryId = $this->storeManager->getStore()->getRootCategoryId();
-        
-        if($catId) {
-            $categoryId = $catId;
-        }
+		if($catId) {
+			$categoryId = $catId;
+		}
 
-        $model = $this->categoryFactory->create();
-        $category = $model->load($categoryId);
-        $displayMode = $category->getDisplayMode();
-        $landingPage = $category->getlandingPage();
-        $cmsIdentifer = '';
-        $cms = '';
-        if($landingPage) {
-            $blockModel = $this->blockFactory->create()->load($landingPage);
-            $cmsIdentifer = $blockModel->getIdentifier();
-            $block = $this->simiLayout
-                ->createBlock('Magento\Cms\Block\Block');
-            $block->setBlockId($category['landing_page']);
-            $cms = $block->toHtml();
-        }
-        return [
-            'display_mode' => $displayMode,
-            'cms_identifier' => $cmsIdentifer,
-            'cms' => $cms
-        ];
-    }
+		$model = $this->categoryFactory->create();
+		$category = $model->load($categoryId);
+		$displayMode = $category->getDisplayMode();
+		$landingPage = $category->getlandingPage();
+		$cmsIdentifer = '';
+		$cms = '';
+		if($landingPage) {
+			$blockModel = $this->blockFactory->create()->load($landingPage);
+			$cmsIdentifer = $blockModel->getIdentifier();
+			$block = $this->simiLayout
+				->createBlock('Magento\Cms\Block\Block');
+			$block->setBlockId($category['landing_page']);
+			$cms = $block->toHtml();
+		}
+		return [
+			'display_mode' => $displayMode,
+			'cms_identifier' => $cmsIdentifer,
+			'cms' => $cms
+		];
+	}
 }
