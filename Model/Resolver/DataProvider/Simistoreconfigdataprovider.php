@@ -20,8 +20,6 @@ class Simistoreconfigdataprovider extends DataProviderInterface
 
 
     public $storeManager;
-    public $checkoutSession;
-    public $quoteFactory;
     public $appScopeConfigInterface;
     public $currencyFactory;
     public $countryModelFactory;
@@ -31,8 +29,6 @@ class Simistoreconfigdataprovider extends DataProviderInterface
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory,
         ScopeConfigInterface $appScopeConfigInterface,
         \Magento\Directory\Model\CountryFactory $countryModelFactory,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
@@ -42,8 +38,6 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         \Magento\Framework\Serialize\SerializerInterface $serializer
     ) {
         $this->storeManager = $storeManager;
-        $this->checkoutSession = $checkoutSession;
-        $this->quoteFactory = $quoteFactory;
         $this->appScopeConfigInterface = $appScopeConfigInterface;
         $this->countryModelFactory = $countryModelFactory;
         $this->currencyFactory = $currencyFactory;
@@ -60,31 +54,6 @@ class Simistoreconfigdataprovider extends DataProviderInterface
      */
     public function getSimiStoreConfigData($args){
         $storeManager = $this->storeManager;
-        $quoteId = $this->checkoutSession->getQuoteId();
-        if ($quoteId) {
-            $quoteModel = $this->quoteFactory->create()->load($quoteId);
-            if ($quoteModel->getId()) {
-                $storeId = $storeManager->getStore()->getId();
-                $currencyCode   = $this->storeManager->getStore()->getCurrentCurrencyCode();
-                if ($storeId && $quoteModel->getData('store_id') !== $storeId) {
-                    $quoteModel->setStoreId($storeId)->collectTotals()->save();
-                }
-                if ($currencyCode && $quoteModel->getQuoteCurrencyCode() !== $currencyCode) {
-                    $quoteModel->setQuoteCurrencyCode($currencyCode)->collectTotals()->save();
-                }
-            }
-        }
-        $params = array();
-        if ($args) {
-            $params = $args;
-        }
-        $data = array(
-            'resource' => 'storeviews',
-            'resourceid' => ($args && isset($args['storeId']))?$args['storeId']:'default',
-            'is_method' => 1,
-            'params' => $params,
-        );
-
         $country_code = $this->getStoreConfig('general/country/default');
         $country      = $this->countryModelFactory->create()->loadByCode($country_code);
 

@@ -13,6 +13,7 @@ type Query {
         storeId: Int @doc(description: "Change store view id"),
         currency: String @doc(description: "Change currency")
      ): SimiStoreConfig @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simistoreconfigresolver") @doc(description: "The store config query")
+    simiStoreGroup : [ SimiStoreGroupData ] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simigroupresolver") @doc(description: "Manually return Store Group Data before magento provide")
     simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details")
 }
 
@@ -78,6 +79,24 @@ type SimiStoreConfig {
     pwa_studio_client_ver_number: String @doc(description: "Client PWA Studio version number")
     root_category_id: Int @doc(description: "Root Category Id of storeview")
     config : SimiStoreConfigDetails @doc(description: "Store config Details")
+}
+
+type SimiStoreGroupData {
+    group_id : String
+    website_id : String
+    name : String
+    root_category_id : String
+    default_store_id : String
+    code : String
+    storeviews : [ SimiGroupDataStoreView ]
+}
+
+type SimiGroupDataStoreView {
+    store_id : String
+    code : String
+    name : String
+    sort_order : String
+    is_active : String
 }
 
 type SimiStoreConfigDetails {
