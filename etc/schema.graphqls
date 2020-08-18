@@ -52,14 +52,6 @@ type SimiLayerFilterItem {
     items_count: Int @doc(description: "Count of items by filter")
 }
 
-type SimiStoreConfig {
-    store_id: String @doc(description: "Current store Id")
-    currency: String @doc(description: "Current currency")
-    pwa_studio_client_ver_number: String @doc(description: "Client PWA Studio version number")
-    root_category_id: Int @doc(description: "Root Category Id of storeview")
-    config_json: String @doc(description: "Simiconnector store configuration values")
-}
-
 type SimiCategoryCms {
     display_mode: String @doc(description: "Category Display Mode")
     cms_identifier: String @doc(description: "Cms block identifier")
@@ -74,4 +66,245 @@ type Subscribe {
 input SimiProductSort @doc(description:"Input SimiProductSort") {
     attribute: String
     direction: String
+}
+
+
+type SimiStoreConfig {
+    store_id: String @doc(description: "Current store Id")
+    currency: String @doc(description: "Current currency")
+    pwa_studio_client_ver_number: String @doc(description: "Client PWA Studio version number")
+    root_category_id: Int @doc(description: "Root Category Id of storeview")
+    config : SimiStoreConfigDetails @doc(description: "Store config Details")
+}
+
+type SimiStoreConfigDetails {
+    base : SimiStoreConfigDetailsBase @doc(description: "Store config Details Base")
+    sales : SimiStoreConfigDetailsSales @doc(description: "Store config Details Sales")
+    checkout : SimiStoreConfigDetailsCheckout @doc(description: "Store config Details Checkout")
+    tax : SimiStoreConfigDetailsTax @doc(description: "Store config Details Tax")
+    customer : SimiStoreConfigDetailsCustomer @doc(description: "Store config Details Customer")
+    catalog : SimiStoreConfigDetailsCatalog @doc(description: "Store config DetailsCatalog")
+    checkout_terms_and_conditions : SimiStoreConfigDetailsCheckoutTerms  @doc(description: "Store config CheckoutTerms")
+    pwacontactus : SimiStoreConfigDetailsPWAContactUs  @doc(description: "Store config PWA Contactus")
+    instant_contact : SimiStoreConfigDetailsInstantContact  @doc(description: "Store config Instant Contact")
+}
+
+type SimiStoreConfigDetailsBase {
+    country_code : String
+    country_name : String
+    magento_version : String
+    locale_identifier : String
+    store_id : String
+    store_name : String
+    store_code : String
+    group_id : String
+    base_url : String
+    use_store : String
+    is_rtl : String
+    is_show_sample_data : String
+    currency_symbol : String
+    currency_code : String
+    currency_position : String
+    thousand_separator : String
+    decimal_separator : String
+    min_number_of_decimals : String
+    max_number_of_decimals : String
+    currencies : [SimiStoreConfigDetailsCurrency] @doc(description: "Currency options")
+    is_show_home_title: String
+    is_show_in_row_price : String
+    is_show_price_for_guest : String
+    open_url_in_app : String
+    connector_version : String
+    is_support_put : String
+    is_support_delete : String
+    default_title : String
+    default_description : String
+    title_prefix : String
+    title_suffix : String
+    default_keywords : String
+}
+
+type SimiStoreConfigDetailsSales {
+    sales_reorder_allow : String
+    sales_totals_sort_subtotal : String
+    sales_totals_sort_discount : String
+    sales_totals_sort_shipping : String
+    sales_totals_sort_weee : String
+    sales_totals_sort_tax : String
+    sales_totals_sort_grand_total : String
+}
+
+type SimiStoreConfigDetailsCheckout {
+    enable_guest_checkout : String
+    enable_agreements : String
+    checkout_webview : SimiCheckoutWebview
+}
+
+type SimiStoreConfigDetailsTax {
+    tax_display_type : String
+    tax_display_shipping : String
+    tax_cart_display_price : String
+    tax_cart_display_subtotal : String
+    tax_cart_display_shipping : String
+    tax_cart_display_grandtotal : String
+    tax_cart_display_full_summary : String
+    tax_cart_display_zero_tax : String
+    tax_sales_display_price : String
+    tax_sales_display_subtotal : String
+    tax_sales_display_shipping : String
+    tax_sales_display_grandtotal : String
+    tax_sales_display_full_summary : String
+    tax_sales_display_zero_tax : String
+}
+
+type SimiStoreConfigDetailsCustomer {
+    address_option : SimiCustomerAddressOption
+    account_option : SimiAccountOption
+    password_validation : SimiPasswordValidation
+    address_fields_config : SimiCIMConfig
+}
+
+type SimiStoreConfigDetailsCatalog {
+    seo : SimiSEOConfig
+    frontend : SimiCatalogFrontendConfig
+    cataloginventory : SimiCatalogInventoryConfig
+    review : SimiCatalogReviewConfig
+}
+
+type SimiStoreConfigDetailsCurrency {
+    value: String
+    title: String
+}
+
+type SimiStoreConfigDetailsCheckoutTerms {
+    title : String
+    content : String
+}
+
+type SimiStoreConfigDetailsPWAContactUs {
+    listEmail : [ SimiContactEmail ]
+    listHotline : [ SimiContactHotLine ]
+    listSms : [ SimiContactSMS ]
+    listWebsite : [ SimiContactWebsite ]
+}
+
+type SimiStoreConfigDetailsInstantContact {
+    email : [ String ]
+    phone : [ String ]
+    message : [ String ]
+    website : String
+    style : String
+    activecolor : String
+}
+
+type SimiCheckoutWebview {
+    enable : String
+    checkout_url : String
+    success_url : String
+    fail_url : String
+}
+
+type SimiCustomerAddressOption {
+    street_lines : String
+    prefix_show : String
+    middlename_show : String
+    suffix_show : String
+    dob_show : String
+    taxvat_show : String
+    gender_show : String
+    gender_value : [ SimiGenderValue ]
+}
+
+type SimiGenderValue {
+    label : String
+    value : String
+}
+
+type SimiAccountOption {
+    taxvat_show : String
+}
+
+type SimiPasswordValidation {
+    minimum_password_length : String
+    required_character_classes_number : String
+}
+
+type SimiCIMConfig {
+    enable : String
+    company_show : String
+    street_show : String
+    country_id_show : String
+    region_id_show : String
+    city_show : String
+    zipcode_show : String
+    telephone_show : String
+    fax_show : String
+    prefix_show : String
+    suffix_show : String
+    dob_show : String
+    gender_show : String
+    taxvat_show : String
+    street_default : String
+    country_id_default : String
+    region_id_default : String
+    city_default : String
+    zipcode_default : String
+    telephone_default : String
+}
+
+type SimiSEOConfig {
+    product_url_suffix : String
+    category_url_suffix : String
+    product_use_categories_inherit : String
+}
+
+type SimiCatalogFrontendConfig {
+    view_products_default : String
+    is_show_zero_price : String
+    is_show_link_all_product : String
+    catalog_frontend_list_mode : String
+    catalog_frontend_grid_per_page_values : String
+    catalog_frontend_list_per_page : String
+    catalog_frontend_list_allow_all : String
+    catalog_frontend_default_sort_by : String
+    catalog_frontend_flat_catalog_category : String
+    catalog_frontend_flat_catalog_product : String
+    catalog_frontend_parse_url_directives : String
+    show_discount_label_in_product : String
+    show_size_in_compare : String
+    footer_title1 : String
+    footer_title2 : String
+    footer_link : String
+}
+
+type SimiCatalogInventoryConfig {
+    cataloginventory_item_options_manage_stock : String
+    cataloginventory_item_options_backorders : String
+    cataloginventory_item_options_max_sale_qty : String
+    cataloginventory_item_options_min_qty : String
+    cataloginventory_item_options_min_sale_qty : String
+    cataloginventory_item_options_notify_stock_qty : String
+    cataloginventory_item_options_enable_qty_increments : String
+    cataloginventory_item_options_qty_increments : String
+    cataloginventory_item_options_auto_return : String
+}
+
+type SimiCatalogReviewConfig {
+    catalog_review_allow_guest : String
+}
+
+type SimiContactEmail {
+    contact_email : String
+}
+
+type SimiContactHotLine {
+    contact_hotline : String
+}
+
+type SimiContactSMS {
+    contact_sms : String
+}
+
+type SimiContactWebsite {
+    contact_website : String
 }
