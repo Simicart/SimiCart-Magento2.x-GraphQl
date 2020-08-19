@@ -13,11 +13,14 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Wishlist\Model\Item;
 use Magento\Wishlist\Model\Wishlist;
 use Magento\Wishlist\Model\WishlistFactory;
+use Magento\Wishlist\Model\Item\OptionFactory;
 use Magento\Wishlist\Model\ResourceModel\Wishlist as WishlistResourceModel;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
 use Magento\Checkout\Model\Cart;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
+use Magento\QuoteGraphQl\Model\Resolver\CustomerCart;
+
 
 /**
  * Fetches the Wishlist data according to the GraphQL schema
@@ -40,6 +43,11 @@ class WishlistToCartResolver implements ResolverInterface
     private $wishlistItem;
 
     /**
+     * @var OptionFactory
+     */
+    protected $wishlistOptFactory;
+
+    /**
      * @var GetCartForUser
      */
     private $getCartForUser;
@@ -50,22 +58,31 @@ class WishlistToCartResolver implements ResolverInterface
     private $cart;
 
     /**
+     * @var CustomerCart
+     */
+    private $customerCart;
+
+    /**
      * @param Item $wishlistItem
+     * @param OptionFactory $wishlistOptFactory
      * @param GetCartForUser $getCartForUser
      */
     public function __construct(
         WishlistResourceModel $wishlistResource,
         WishlistFactory $wishlistFactory,
         Item $wishlistItem,
+        OptionFactory $wishlistOptFactory,
         GetCartForUser $getCartForUser,
-        Cart $cart
-    )
-    {
+        Cart $cart,
+        CustomerCart $customerCart
+    ) {
         $this->wishlistResource = $wishlistResource;
         $this->wishlistFactory = $wishlistFactory;
         $this->wishlistItem = $wishlistItem;
+        $this->wishlistOptFactory = $wishlistOptFactory;
         $this->getCartForUser = $getCartForUser;
         $this->cart = $cart;
+        $this->customerCart = $customerCart;
     }
 
     /**
@@ -92,13 +109,19 @@ class WishlistToCartResolver implements ResolverInterface
         $this->cart->setQuote($quote);
         $this->wishlistItem->load($args['item_id']);
         if ($this->wishlistItem->getId()) {
+            $wishlistOption = $this->wishlistOptFactory->create()->setItem($this->wishlistItem);
+            $optionCollection = $wishlistOption->getCollection();
+            $optionCollection->addItemFilter($this->wishlistItem);
+                // ->addFieldToFilter('code', 'info_buyRequest');
+            foreach($optionCollection as $option){
+                $this->wishlistItem->addOption($option);
+            }
             $result = $this->wishlistItem->addToCart($this->cart, true); // must add to wishlist with full request options before
-            // if ($result) {
-            //     $cart = $this->getCartForUser->execute($maskedCartId, $context->getUserId(), $storeId);
-            //     return [
-            //         'model' => $cart,
-            //     ];
-            // }
+            if ($result) {
+                $this->cart->save();
+            } else {
+                return false;
+            }
         } else {
             throw new GraphQlAuthorizationException(__('This wishlist item does not exists.'));
         }
@@ -113,12 +136,15 @@ class WishlistToCartResolver implements ResolverInterface
         }
 
         return [
-            'id' => $wishlist->getId(),
-            'sharing_code' => $wishlist->getSharingCode(),
-            'updated_at' => $wishlist->getUpdatedAt(),
-            'items_count' => $wishlist->getItemsCount(),
-            'name' => $wishlist->getName(),
-            'model' => $wishlist,
+            'wishlist' => [
+                'id' => $wishlist->getId(),
+                'sharing_code' => $wishlist->getSharingCode(),
+                'updated_at' => $wishlist->getUpdatedAt(),
+                'items_count' => $wishlist->getItemsCount(),
+                'name' => $wishlist->getName(),
+                'model' => $wishlist,
+            ],
+            'cart' => $this->customerCart->resolve($field, $context, $info, $value, $args)
         ];
     }
 }
