@@ -7,14 +7,15 @@ type Query {
         currentPage: Int = 1 @doc(description: "Specifies which page of results to return. The default value is 1."),
         sort: ProductSortInput @doc(description: "Specifies which attribute to sort on, and whether to return the results in ascending or descending order."),
         simiProductSort: SimiProductSort @doc(description: "SimiProductSort.")
-     ): Simiproducts
+    ): Simiproducts
     @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simiproducts") @doc(description: "The products query searches for products that match the criteria specified in the search and filter attributes")
     simiStoreConfig(
         storeId: Int @doc(description: "Change store view id"),
         currency: String @doc(description: "Change currency")
-     ): SimiStoreConfig @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simistoreconfigresolver") @doc(description: "The store config query")
+    ): SimiStoreConfig @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simistoreconfigresolver") @doc(description: "The store config query")
     simiStoreGroup : [ SimiStoreGroupData ] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simigroupresolver") @doc(description: "Manually return Store Group Data before magento provide")
     simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details")
+    customerOrder(order_number: String!): CustomerOrder @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrderDetailsResolver") @doc(description: "Get customer order details by order_number")
 }
 
 type Mutation {
@@ -22,6 +23,36 @@ type Mutation {
     wishlist(product: Int!, data: String): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistResolver") @doc(description: "Add wishlist item to customer's wishlist.")
     wishlistToCart(item_id: Int!, cart_id: String!): WishlistCart @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistToCartResolver") @doc(description: "Add wishlist item to cart.")
     wishlistRemoveItem(item_id: Int!): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistRemoveItemResolver") @doc(description: "Remove wishlist item from customer's wishlist.")
+}
+
+type CustomerOrder {
+    prices: OrderTotal @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\TotalsResolver") @doc(description: "Total segment of the order totals.")
+    items: [OrderItem] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\ItemsResolver") @doc(description: "Customer order items.")
+    billing_address: CustomerAddress @doc(description: "Customer order address.")
+    shipping_address: CustomerAddress @doc(description: "Customer order address.")
+    shipping_method: String @doc(description: "Customer order shipping method.")
+    payment_method: String @doc(description: "Customer order payment method title.")
+    is_virtual: Boolean @doc(description: "Customer order is virtual.")
+}
+
+type OrderItem @doc(description: "Customer order item.") {
+    id: Int
+    name: String
+    url_key: String
+    image: String
+    sku: String
+    price: Float
+    qty: Int
+    discount: Float
+    row_total: Float
+}
+
+type OrderTotal {
+    sub_total: Money
+    grand_total: Money
+    tax: Money
+    discount: Money
+    discounts: [Discount] @doc(description:"An array of applied discounts") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\DiscountResolver")
 }
 
 type WishlistCart {
