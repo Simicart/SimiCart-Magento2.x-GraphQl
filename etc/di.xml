@@ -7,4 +7,8 @@
             </argument>
         </arguments>
     </type>
+    <!-- session init observer fix from magento 2.3.5 (customer_session_init event removed) -->
+    <type name="Magento\Framework\App\FrontControllerInterface">
+        <plugin name="simiconnectorgrapqhl_session_init_plugin" type="Simi\SimiconnectorGraphQl\Plugin\CustomerSessionInit" />
+    </type>
 </config>
