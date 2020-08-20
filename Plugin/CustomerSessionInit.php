@@ -31,14 +31,14 @@ class CustomerSessionInit
         )
             return;
         
-        $contents            = $this->request->getContent();
+        $contents            = $request->getContent();
         $contents_array      = [];
         if ($contents && ($contents != '')) {
             $contents_parser = urldecode($contents);
             $contents_array = json_decode($contents_parser, true);
         }
-        $simiStoreId = $this->request->getParam('simiStoreId');
-        $simiCurrency = $this->request->getParam('simiCurrency');
+        $simiStoreId = $request->getParam('simiStoreId');
+        $simiCurrency = $request->getParam('simiCurrency');
         if ($contents_array) {
             if (!$simiStoreId && isset($contents_array['variables']['simiStoreId'])) {
                 $simiStoreId = $contents_array['variables']['simiStoreId'];
@@ -60,7 +60,7 @@ class CustomerSessionInit
             }
         }
         //in case of GET graphQL
-        $graphQLVariables = $this->request->getParam('variables');
+        $graphQLVariables = $request->getParam('variables');
         if ($graphQLVariables) {
             $graphQLVariables = json_decode($graphQLVariables, true);
             if ($graphQLVariables && is_array($graphQLVariables)) {
