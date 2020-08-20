@@ -26,6 +26,8 @@ class Simistoreconfigdataprovider extends DataProviderInterface
     public $localeResolver;
     public $frmwCurrencyFactory;
     public $serializer;
+    public $configArray;
+    public $eventManager;
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -35,6 +37,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         \Magento\Framework\Locale\Resolver $localeResolver,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Framework\CurrencyFactory $frmwCurrencyFactory,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Framework\Serialize\SerializerInterface $serializer
     ) {
         $this->storeManager = $storeManager;
@@ -44,6 +47,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         $this->localeResolver = $localeResolver;
         $this->customerFactory = $customerFactory;
         $this->frmwCurrencyFactory = $frmwCurrencyFactory;
+        $this->eventManager = $eventManager;
         $this->serializer = $serializer;
     }
 
@@ -307,15 +311,17 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'content' => $this->getStoreConfig('simiconnector/terms_conditions/term_html'),
             ];
         }
+        $this->configArray = $configArray;
+        $this->eventManager
+                ->dispatch('simiconnectorgrapqhl_get_storeview_info_after', ['object' => $this]);
 
-        
         return array(
             'store_id' => (int)$storeManager->getStore()->getId(),
             'currency' => $storeManager->getStore()->getCurrentCurrencyCode(),
             'root_category_id' => (int)$storeManager->getStore()->getRootCategoryId(),
             'pwa_studio_client_ver_number' => $this->appScopeConfigInterface
                 ->getValue('simiconnector/general/pwa_studio_client_ver_number'),
-            'config' => $configArray,
+            'config' => $this->configArray,
         );
     }
 
