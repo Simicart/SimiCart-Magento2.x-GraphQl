@@ -10,16 +10,22 @@ class CustomerSessionInit
     private $httpContext;
     private $appState;
     private $sessionManager;
+    private $storeRepository;
+    private $storeCookieManager;
 
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
         StoreManagerInterface $storeManager,
         \Magento\Framework\App\Http\Context $httpContext,
+        \Magento\Store\Api\StoreRepositoryInterface $storeRepository,
+        \Magento\Store\Api\StoreCookieManagerInterface $storeCookieManager,
         \Magento\Framework\App\State $appState
     ) {
         $this->simiObjectManager = $simiObjectManager;
         $this->storeManager = $storeManager;
         $this->httpContext = $httpContext;
+        $this->storeRepository = $storeRepository;
+        $this->storeCookieManager = $storeCookieManager;
         $this->appState = $appState;
     }
     //add session id to continue session with graphql
@@ -89,7 +95,6 @@ class CustomerSessionInit
                 $storeKey = StoreManagerInterface::CONTEXT_STORE;
                 $this->httpContext->setValue($storeKey, $storeCode, $this->storeManager->getDefaultStoreView()->getCode());
             } catch (\Exception $e) {
-
             }
         }
         if ($simiCurrency && $simiCurrency != '' && $simiCurrency != $this->storeManager->getStore()->getCurrentCurrencyCode()) {
