@@ -71,7 +71,7 @@ class ProductSearch
         CollectionPostProcessor $collectionPostProcessor,
         SearchResultApplierFactory $searchResultsApplierFactory,
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
-        \Simi\Simiconnector\Helper\Products $simiProductHelper,
+        \Simi\SimiconnectorGraphQl\Helper\Products $simiProductHelper,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -133,7 +133,7 @@ class ProductSearch
             $helper->is_search = 1;
             $params['filter']['q'] = $args['search'];
             $helper->getSearchProducts($collection, $params);
-            if (!isset($args['sort'])) {
+            if (!isset($args['sort']) || $args['sort']) {
                 $collection->setOrder('relevance', 'desc');
             }
             $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH)));
