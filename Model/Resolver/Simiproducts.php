@@ -142,64 +142,58 @@ class Simiproducts implements ResolverInterface
         $products = $searchResult->getProductsSearchResult();
         $isShowOptionsInListing = $this->scopeConfig
             ->getValue('siminiaconfig/compareconfig/show_size_in_compare');
-        foreach ($products as $index => $product) {
-            $productModel = $product['model'];
-            if ($productModel->getId()) {
-                if (count($products) > 1) { //listing
-                    $attributes = $productModel->toArray();
-                    if (isset($attributes['description']))
-                        unset($attributes['description']);
-                    $options = null;
-                    if($isShowOptionsInListing){
-                        $options = $this->simiOptionHelper->getOptions($productModel);
-                    }
-                    $this->productExtraData = array(
-                        'attribute_values' => $attributes,
-                        'app_options' => $options,
-                        'app_reviews' => $this->simiReviewHelper
-                            ->getProductReviews($productModel->getId())
-                    );
-                    $this->currentProductModel = $productModel;
-                    $this->eventManager->dispatch(
-                        'simi_simiconnector_graphql_simi_product_list_item_after',
-                        ['object' => $this, 'extraData' => $this->productExtraData]
-                    );
-                    $product['simiExtraField'] = json_encode($this->productExtraData);
-                    $products[$index] = $product;
-                } else { //details
-                    $registry = $this->registry;
-                    if (!$registry->registry('product') && $productModel->getId()) {
-                        $registry->register('product', $productModel);
-                        $registry->register('current_product', $productModel);
-                    }
-                    $options = $this->simiOptionHelper->getOptions($productModel);
+	    foreach ($products as $index => $product) {
+		    $productModel = $product['model'];
+		    if ($productModel->getId()) {
+			    if (count($products) > 1) { //listing
+				    $attributes = $productModel->toArray();
+				    if (isset($attributes['description']))
+					    unset($attributes['description']);
 
-                    $app_reviews  = $this->simiReviewHelper
-                        ->getProductReviews($productModel->getId());
+				    $this->productExtraData = array(
+					    'attribute_values' => $attributes,
+					    'app_reviews' => $this->simiReviewHelper
+						    ->getProductReviews($productModel->getId())
+				    );
+				    $this->currentProductModel = $productModel;
+				    $this->eventManager->dispatch(
+					    'simi_simiconnector_graphql_simi_product_list_item_after',
+					    ['object' => $this, 'extraData' => $this->productExtraData]
+				    );
+				    $product['simiExtraField'] = json_encode($this->productExtraData);
+				    $products[$index] = $product;
+			    } else { //details
+				    $registry = $this->registry;
+				    if (!$registry->registry('product') && $productModel->getId()) {
+					    $registry->register('product', $productModel);
+					    $registry->register('current_product', $productModel);
+				    }
 
-                    $layout      = $this->simiLayout;
-                    $block_att   = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
-                    $_additional = $block_att->getAdditionalData();
+				    $app_reviews  = $this->simiReviewHelper
+					    ->getProductReviews($productModel->getId());
 
-                    $tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);
+				    $layout      = $this->simiLayout;
+				    $block_att   = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
+				    $_additional = $block_att->getAdditionalData();
 
-                    $this->extraFields = array(
-                        'attribute_values' => $productModel->toArray(),
-                        'app_options' => $options,
-                        'app_reviews' => $app_reviews,
-                        'additional'  => $_additional,
-                        'app_tier_prices' => $tierPrice,
-                    );
-                    $this->currentProductModel = $productModel;
-                    $this->eventManager->dispatch(
-                        'simi_simiconnector_graphql_product_detail_extra_field_after',
-                        ['object' => $this, 'data' => $this->extraFields]
-                    );
-                    $product['simiExtraField'] = json_encode($this->extraFields);
-                    $products[$index] = $product;
-                }
-            }
-        }
+				    $tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);
+
+				    $this->extraFields = array(
+					    'attribute_values' => $productModel->toArray(),
+					    'app_reviews' => $app_reviews,
+					    'additional'  => $_additional,
+					    'app_tier_prices' => $tierPrice,
+				    );
+				    $this->currentProductModel = $productModel;
+				    $this->eventManager->dispatch(
+					    'simi_simiconnector_graphql_product_detail_extra_field_after',
+					    ['object' => $this, 'data' => $this->extraFields]
+				    );
+				    $product['simiExtraField'] = json_encode($this->extraFields);
+				    $products[$index] = $product;
+			    }
+		    }
+	    }
 
         $this->result = [
             'total_count' => $searchResult->getTotalCount(),
