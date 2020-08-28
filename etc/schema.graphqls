@@ -79,6 +79,10 @@ interface CategoryInterface {
     simiCategoryCms: SimiCategoryCms  @doc(description: "Get Cms Config For Category") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiCategoryCms")
 }
 
+type AvailablePaymentMethod {
+    simi_payment_content : String @doc(description: "Payment content for extra data") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\PaymentContent")
+}
+
 type SimiLayerFilter {
     name: String @doc(description: "Layered navigation filter name")
     request_var: String @doc(description: "Request variable name for filter query")

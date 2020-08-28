@@ -201,7 +201,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->is_search)
             $attributeCollection->addFieldToFilter('is_filterable_in_search', 1);
 
-
         $allProductIds = $collection->getAllIds();
         $arrayIDs      = [];
         foreach ($allProductIds as $allProductId) {
@@ -211,7 +210,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
         $titleFilters = [];
         $this->_filterByAtribute($collection, $attributeCollection, $titleFilters, $layerFilters, $arrayIDs);
-        $this->_filterByPriceRange($layerFilters, $collection, $params);
 
         // category
         if ($this->category) {
@@ -379,47 +377,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
-    public function _filterByPriceRange(&$layerFilters, $collection, $params)
-    {
-        $priceRanges = $this->_getPriceRanges($collection);
-        $filters     = [];
-        $totalCount  = 0;
-        $maxIndex    = 0;
-        if (count($priceRanges['counts']) > 0) {
-            $maxIndex = max(array_keys($priceRanges['counts']));
-        }
-        foreach ($priceRanges['counts'] as $index => $count) {
-            if ($index === '' || $index == 1) {
-                $index = 1;
-                $totalCount += $count;
-            } else {
-                $totalCount = $count;
-            }
-            if (isset($params['layer']['price'])) {
-                $prices    = explode('-', $params['layer']['price']);
-                $fromPrice = $prices[0];
-                $toPrice   = $prices[1];
-            } else {
-                $fromPrice = $priceRanges['range'] * ($index - 1);
-                $toPrice   = $index == $maxIndex ? '' : $priceRanges['range'] * ($index);
-            }
-
-            if ($index >= 1) {
-                $filters[$index] = [
-                    'value' => $fromPrice . '-' . $toPrice,
-                    'label' => $this->_renderRangeLabel($fromPrice, $toPrice),
-                    'count' => (int) ($totalCount)
-                ];
-            }
-        }
-        if (count($filters) >= 1) {
-            $layerFilters[] = [
-                'attribute' => 'price',
-                'title'     => __('Price'),
-                'filter'    => array_values($filters),
-            ];
-        }
-    }
     /*
      * Get price range filter
      *
