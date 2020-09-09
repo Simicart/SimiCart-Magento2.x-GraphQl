@@ -103,7 +103,7 @@ class CustomerOrderDetailsResolver implements ResolverInterface
             'status' => $order->getStatus(),
             'billing_address' => $billingAddress,
             'shipping_address' => $shippingAddress,
-            'shipping_method' => $order->getShippingMethod(),
+            'shipping_method' => $order->getShippingDescription(),
             'payment_method' => $order->getPayment()->getMethodInstance()->getTitle(),
             'is_virtual' => $order->getIsVirtual(),
             'model' => $order
