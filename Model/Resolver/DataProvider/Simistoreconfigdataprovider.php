@@ -28,6 +28,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
     public $serializer;
     public $configArray;
     public $eventManager;
+	private $simiObjectManager;
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -38,7 +39,8 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Framework\CurrencyFactory $frmwCurrencyFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
-        \Magento\Framework\Serialize\SerializerInterface $serializer
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
+	    \Magento\Framework\ObjectManagerInterface $simiObjectManager
     ) {
         $this->storeManager = $storeManager;
         $this->appScopeConfigInterface = $appScopeConfigInterface;
@@ -49,6 +51,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         $this->frmwCurrencyFactory = $frmwCurrencyFactory;
         $this->eventManager = $eventManager;
         $this->serializer = $serializer;
+	    $this->simiObjectManager = $simiObjectManager;
     }
 
     /**
@@ -261,7 +264,8 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'website'     => $this->getStoreConfig("simiconnector/instant_contact/website"),
                 'style'       => $this->getStoreConfig("simiconnector/instant_contact/style"),
                 'activecolor' => $this->getStoreConfig("simiconnector/instant_contact/icon_color"),
-            ]
+            ],
+	        'rating_form' => $this->getFormReviewCriterias()
         );
 
 
@@ -356,7 +360,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'title' => $currencyTitle,
             ];
         }
-        
+
         return $currencies;
     }
 
@@ -375,4 +379,26 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         $result['required_character_classes_number'] = $this->getStoreConfig('customer/password/required_character_classes_number');
         return $result;
     }
+
+	private function getFormReviewCriterias() {
+		$block = $this->simiObjectManager->get( 'Magento\Review\Block\Form' );
+		$rates = [];
+		if ( $block->getRatings() && $block->getRatings()->getSize() ) {
+			foreach ( $block->getRatings() as $_rating ) {
+				$_options = [];
+				foreach ( $_rating->getOptions() as $_option ) {
+					$_options[] = [
+						'key'   => $_rating->getId(),
+						'value' => $_option->getId(),
+					];
+				}
+				$rates[] = [
+					'rate_code'    => $block->escapeHtml( $_rating->getRatingCode() ),
+					'rate_options' => $_options,
+				];
+			}
+		}
+
+		return $rates;
+	}
 }
