@@ -348,16 +348,19 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         $codes      = $this->storeManager->getStore()->getAvailableCurrencyCodes(true);
         $locale     = $this->localeResolver->getLocale();
         foreach ($codes as $code) {
-            $currencyTitle = '';
+            $currencyTitle = $code;
+            $currencySymbol = '';
             try {
                 $options    = $this->frmwCurrencyFactory->create([null, $locale]);
                 $currencyTitle = $options->getName($code, $locale);
+	            $currencySymbol = $options->getSymbol($code, $locale);
             } catch (\Exception $e) {
-                $currencyTitle = $code;
+
             }
             $currencies[] = [
                 'value' => $code,
                 'title' => $currencyTitle,
+	            'symbol' => $currencySymbol
             ];
         }
 

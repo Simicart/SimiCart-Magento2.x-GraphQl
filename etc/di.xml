@@ -7,8 +7,14 @@
             </argument>
         </arguments>
     </type>
-    <!-- session init observer fix from magento 2.3.5 (customer_session_init event removed) -->
-    <type name="Magento\Framework\App\FrontControllerInterface">
-        <plugin name="simiconnectorgrapqhl_session_init_plugin" type="Simi\SimiconnectorGraphQl\Plugin\CustomerSessionInit" />
+
+    <type name="Magento\Store\Model\Store">
+        <plugin name="simiconnectorgrapqhl_store_model_plugin" type="Simi\SimiconnectorGraphQl\Plugin\Store" />
+    </type>
+    <type name="Magento\Store\Api\StoreCookieManagerInterface">
+        <plugin name="simiconnectorgrapqhl_store_cookie_manager_plugin" type="Simi\SimiconnectorGraphQl\Plugin\StoreCookieManager" />
+    </type>
+    <type name="Magento\QuoteGraphQl\Model\Cart\GetCartForUser">
+        <plugin name="simiconnectorgrapqhl_get_cart_for_user_plugin" type="Simi\SimiconnectorGraphQl\Plugin\GetCartForUser" />
     </type>
 </config>
