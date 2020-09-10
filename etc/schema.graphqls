@@ -149,6 +149,7 @@ type SimiStoreConfigDetails {
     checkout_terms_and_conditions : SimiStoreConfigDetailsCheckoutTerms  @doc(description: "Store config CheckoutTerms")
     pwacontactus : SimiStoreConfigDetailsPWAContactUs  @doc(description: "Store config PWA Contactus")
     instant_contact : SimiStoreConfigDetailsInstantContact  @doc(description: "Store config Instant Contact")
+	rating_form: [SimiStoreConfigRatingForm] @doc(description: "Store config from rating criterias")
 }
 
 type SimiStoreConfigDetailsBase {
@@ -257,6 +258,16 @@ type SimiStoreConfigDetailsInstantContact {
     website : String
     style : String
     activecolor : String
+}
+
+type SimiStoreConfigRatingForm {
+	rate_code: String!
+	rate_options: [ SimiRatingOptions ]! @doc(description: "Retrieves metadata of rating options")
+}
+
+type SimiRatingOptions {
+	key: String!
+	value: String!
 }
 
 type SimiCheckoutWebview {
