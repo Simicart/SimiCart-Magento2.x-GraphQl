@@ -16,6 +16,7 @@ type Query {
     simiStoreGroup : [ SimiStoreGroupData ] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simigroupresolver") @doc(description: "Manually return Store Group Data before magento provide")
     simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details")
     customerOrder(order_number: String!): CustomerOrder @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrderDetailsResolver") @doc(description: "Get customer order details by order_number")
+	customerOrders: CustomerOrders @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Orders") @doc(description: "List of customer orders") @cache(cacheable: false)
 }
 
 type Mutation {
@@ -380,4 +381,18 @@ type SimiContactSMS {
 
 type SimiContactWebsite {
     contact_website : String
+}
+
+type SimiCustomerOrder @doc(description: "Order mapping fields") {
+	id: Int
+	increment_id: String @deprecated(reason: "Use the order_number instead.")
+	order_number: String! @doc(description: "The order number")
+	created_at: String
+	grand_total: Float
+	status: String
+	order_currency: String
+}
+
+type CustomerOrders {
+	items: [SimiCustomerOrder] @doc(description: "Array of orders")
 }
