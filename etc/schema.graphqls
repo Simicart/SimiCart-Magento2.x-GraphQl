@@ -238,6 +238,7 @@ type SimiStoreConfigDetailsCatalog {
 type SimiStoreConfigDetailsCurrency {
     value: String
     title: String
+	symbol: String
 }
 
 type SimiStoreConfigDetailsCheckoutTerms {
