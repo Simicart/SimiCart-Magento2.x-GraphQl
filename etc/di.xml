@@ -10,4 +10,7 @@
     <type name="Magento\QuoteGraphQl\Model\Cart\GetCartForUser">
         <plugin name="simiconnectorgrapqhl_get_cart_for_user_plugin" type="Simi\SimiconnectorGraphQl\Plugin\GetCartForUser" />
     </type>
+	<type name="Magento\QuoteGraphQl\Model\Cart\BuyRequest\CustomizableOptionsDataProvider">
+		<plugin name="simiconnectorgrapqhl_buy_request_customization_options_data_provider_plugin" type="Simi\SimiconnectorGraphQl\Plugin\CustomizableOptionsDataProvider" />
+	</type>
 </config>
