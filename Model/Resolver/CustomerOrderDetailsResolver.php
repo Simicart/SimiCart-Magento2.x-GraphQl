@@ -49,7 +49,10 @@ class CustomerOrderDetailsResolver implements ResolverInterface
 
         $orderNumber = $args['order_number'];
         $storeId = (string)$context->getExtensionAttributes()->getStore()->getId();
-        $order = $this->orderFactory->create()->loadByIncrementIdAndStoreId($orderNumber, $storeId);
+        /*$order = $this->orderFactory->create()->loadByIncrementIdAndStoreId($orderNumber, $storeId);*/
+
+        // get order without storeId.
+	    $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
 
         $billingAddress = null;
         $shippingAddress = null;
