@@ -146,15 +146,15 @@ class Simiproducts implements ResolverInterface
 		    $productModel = $product['model'];
 		    if ($productModel->getId()) {
 			    if (count($products) > 1) { //listing
-				    $attributes = $productModel->toArray();
+				    /*$attributes = $productModel->toArray();
 				    if (isset($attributes['description']))
-					    unset($attributes['description']);
+					    unset($attributes['description']);*/
 
-				    $this->productExtraData = array(
+				    $this->productExtraData = [] /*array(
 					    'attribute_values' => $attributes,
 					    'app_reviews' => $this->simiReviewHelper
 						    ->getProductReviews($productModel->getId())
-				    );
+				    )*/;
 				    $this->currentProductModel = $productModel;
 				    $this->eventManager->dispatch(
 					    'simi_simiconnector_graphql_simi_product_list_item_after',
@@ -169,20 +169,20 @@ class Simiproducts implements ResolverInterface
 					    $registry->register('current_product', $productModel);
 				    }
 
-				    $app_reviews  = $this->simiReviewHelper
-					    ->getProductReviews($productModel->getId());
+				    /*$app_reviews  = $this->simiReviewHelper
+					    ->getProductReviews($productModel->getId());*/
 
 				    $layout      = $this->simiLayout;
 				    $block_att   = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
 				    $_additional = $block_att->getAdditionalData();
 
-				    $tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);
+				    /*$tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);*/
 
 				    $this->extraFields = array(
-					    'attribute_values' => $productModel->toArray(),
-					    'app_reviews' => $app_reviews,
+					    /*'attribute_values' => $productModel->toArray(),
+					    'app_reviews' => $app_reviews,*/
 					    'additional'  => $_additional,
-					    'app_tier_prices' => $tierPrice,
+					    /*'app_tier_prices' => $tierPrice,*/
 				    );
 				    $this->currentProductModel = $productModel;
 				    $this->eventManager->dispatch(
