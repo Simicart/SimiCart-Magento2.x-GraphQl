@@ -38,59 +38,33 @@ class ProductList implements ResolverInterface
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
-        $content_type = $this->imageHelper->getVisibilityTypeId('productlist');
-        $objectManager =  \Magento\Framework\App\ObjectManager::getInstance();        
-        $storeManager  = $objectManager->get('\Magento\Store\Model\StoreManagerInterface');
-        //get current store view id
-        $storeID = (int)$context->getExtensionAttributes()->getStore()->getId();
-        
-        $data = [];//the array return visibility information of the ProductList
-        $productListId = [];//the array return the product list id which meet the requirements of current the storeview
-        $returnProductList = [];//the array return the final productList set we need about the information of the choosen ProductList
+        $typeID = $this->imageHelper->getVisibilityTypeId('productlist');
+        $productListCollection = $this->collectionProductList->create()->addFieldToFilter('list_status', '1')
+                ->applyAPICollectionFilter('simiconnector_visibility', $typeID, (int)$context->getExtensionAttributes()->getStore()->getId());
+        $returnProductList = $productListCollection->getData();
 
-        //get all information of visibility about product list type
-        $productList_StoreView =  $this->collectionVisibility->create()->addFieldToFilter('content_type', ['eq' => $content_type])->getData();
-        for ($i=0; $i <sizeof($productList_StoreView) ; $i++) 
-        { 
-            if($productList_StoreView[$i]['store_view_id'] == $storeID)
-            {
-                array_push($data,$productList_StoreView[$i]);
-            }  
-        }
-        //if no data is stored(which mean no product list are the right to show in the current store view) -> return null
-        if(sizeof($data) == 0){
+        if(sizeof($returnProductList) == 0){
             return null;
         }
         else
         {
-            // get all id of all product list which meet the requirements of the current storeview 
-            for($i=0; $i<sizeof($data); $i++){
-                array_push($productListId, (int)$data[$i]['item_id']);
-            }
-
-            //get the information about the categories base on the id given above
-            for($i=0; $i<sizeof($productListId); $i++){
-                $productListCollection = $this->collectionProductList->create();
-                array_push($returnProductList, $productListCollection->addFieldToFilter('productlist_id', ['eq' => $productListId[$i]])->getData()[0]);
-            }
-            //sort the return Categories base on the sort order attribute
-            usort($returnProductList, $this->build_sorter('sort_order'));
-            //push the return categiries into the array
+            //reorder the data base on the attribute sort_order
             $finalResult = [];
-           
+            usort($returnProductList, $this->build_sorter('sort_order'));
             for($i=0; $i<sizeof($returnProductList); $i++)
             {
-                $productListFileName = str_replace("Simiconnector", "",$returnProductList[$i]["list_image"]);
-                $productListFileNameTablet = str_replace("Simiconnector", "",$returnProductList[$i]["list_image_tablet"]);
+            
+            $productListFileName = str_replace("Simiconnector", "",$returnProductList[$i]["list_image"]);
+            $productListFileNameTablet = str_replace("Simiconnector", "",$returnProductList[$i]["list_image_tablet"]);
             //get the url of the file by helper
             $productListUrl = $this->imageHelper->getBaseUrl() . $productListFileName;
             //get url of the file table by helper
             $productListUrlTablet = $this->imageHelper->getBaseUrl() . $productListFileNameTablet;
             
             $productList = [
-                'listTitle' => $returnProductList[$i]['list_title'],
-                'ImageUrl' => $productListUrl,
-                'ImageUrlTablet' => $productListUrlTablet,
+                'list_title' => $returnProductList[$i]['list_title'],
+                'image_url' => $productListUrl,
+                'image_url_tablet' => $productListUrlTablet,
                 'type' => $returnProductList[$i]['list_type'],
                 'list_Product' => $returnProductList[$i]['list_products'],
                 'status' => $returnProductList[$i]['list_status'],

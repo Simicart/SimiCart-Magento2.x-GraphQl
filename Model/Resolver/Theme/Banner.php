@@ -18,9 +18,8 @@ class Banner implements ResolverInterface
 	protected $collectionVisibility;
     protected $collectionBanner;
     protected $imageHelper;
-    /**
-     * @param DataProvider\Faq $faqRepository
-     */
+    protected $bannerCollection;
+    
     public function __construct(
     	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -37,48 +36,19 @@ class Banner implements ResolverInterface
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
-        $content_type = $this->imageHelper->getVisibilityTypeId('banner');
-        $objectManager =  \Magento\Framework\App\ObjectManager::getInstance();        
-        $storeManager  = $objectManager->get('\Magento\Store\Model\StoreManagerInterface');
-        //get current store view id
-        $storeID = (int)$context->getExtensionAttributes()->getStore()->getId();
-        
-        $data = [];//the array return visibility information of the banner
-        $bannerid = [];//the array return the banner id which meet the requirements of the storeview
-        $returnbanner = [];//the array return the final results about the information of the choosen banner
-
-        //get all information of visibility about banner type
-        $bannerStoreView =  $this->collectionVisibility->create()->addFieldToFilter('content_type', ['eq' => $content_type])->getData();
-        for ($i=0; $i <sizeof($bannerStoreView) ; $i++) 
-        { 
-            if($bannerStoreView[$i]['store_view_id'] ==   $storeID)
-            {
-                array_push($data,$bannerStoreView[$i]);
-            }  
-        }
-
+        $typeID = $this->imageHelper->getVisibilityTypeId('banner');
+        $bannerCollection = $this->collectionBanner->create()->addFieldToFilter('status', '1')
+                ->applyAPICollectionFilter('simiconnector_visibility', $typeID, (int)$context->getExtensionAttributes()->getStore()->getId());
+        $returnbanner = $bannerCollection->getData();
         //if no data is stored -> return null
-        if(sizeof($data) == 0){
+        if(sizeof($returnbanner) == 0){
             return null;
         }
         else
         {
-            // get all id of banner which meet the requirements of the storeview 
-            for($i=0; $i<sizeof($data); $i++){
-                array_push($bannerid, (int)$data[$i]['item_id']);
-            }
-
-            //get the information about banner base on the id given above
-            for($i=0; $i<sizeof($bannerid); $i++){
-                $bannercollection = $this->collectionBanner->create();
-                array_push($returnbanner, $bannercollection->addFieldToFilter('banner_id', ['eq' => $bannerid[$i]])->getData()[0]);
-            }
-            
-            usort($returnbanner, $this->build_sorter('sort_order'));
-        
-
-            //push the return banners into the array
             $finalResult = [];
+            //reorder the data base on the sort_order attribute
+            usort($returnbanner, $this->build_sorter('sort_order'));
 
             for($i=0; $i<sizeof($returnbanner); $i++)
             {
@@ -102,9 +72,10 @@ class Banner implements ResolverInterface
                 'banner_name_tablet' => $bannernametablet,
                 'banner_title' => $returnbanner[$i]['banner_title'],
                 'status' => $returnbanner[$i]['status'],
-                'categoryID' => $returnbanner[$i]['category_id'],
-                'productID' => $returnbanner[$i]['product_id'],
-                'sortOder' => $returnbanner[$i]['sort_order']
+                'category_id' => $returnbanner[$i]['category_id'],
+                'product_id' => $returnbanner[$i]['product_id'],
+                'sort_order' => $returnbanner[$i]['sort_order'],
+                'type' => (int)$returnbanner[$i]['type']
             ];
             array_push($finalResult, $banner);
             }
@@ -114,6 +85,7 @@ class Banner implements ResolverInterface
 
 
     }
+    //this function soer the array by atribute key
     private function build_sorter($key) 
     {
         return function ($a, $b) use ($key) {
