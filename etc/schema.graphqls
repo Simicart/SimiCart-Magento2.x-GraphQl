@@ -17,6 +17,70 @@ type Query {
     simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details")
     customerOrder(order_number: String!): CustomerOrder @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrderDetailsResolver") @doc(description: "Get customer order details by order_number")
 	customerOrders: CustomerOrders @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Orders") @doc(description: "List of customer orders") @cache(cacheable: false)
+
+    simibanner:[SimiBanner] @doc(description: "return the information of the banner which match the current store view") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\Banner")
+
+    simiCategories: [SimiCategory] @doc(description: "return the information of a list of home categories") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCategory")
+
+    simiproductlist: [SimiProductList] @doc(description: "return the information of a list of productList") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\ProductList")
+    
+    simicmspage : [SimiCMSpage] @doc(description: "return the information of the simi CMS") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCMSpage")
+}
+
+type SimiBanner @doc(description: "data of the banner"){
+    banner_name: String @doc(description: "the name of the banner")
+    banner_url: String @doc(description: "the url of the banner")
+    banner_name_tablet: String @doc(description: "the name link of the banner in table form")
+    banner_title: String @doc(description: "the title of the banner")
+    status: String @doc(description: "the status of the banner")
+    categoryID: Int @doc(description: "the product id of this banner")
+    productID: Int @doc(description: "the product id of this banner")
+    sortOrder: Int @doc(description: "the short order of the banner")
+}
+
+type SimiCMSpage @doc(description: "return the Cms page data"){
+    cms_title: String @doc(description: "the title of the cms page")
+    cms_content: String @doc(description: "the content of the cms page")
+    cms_status: Int @doc(description: "the status of the cms page")
+    website_id: Int @doc(description: "the website ID which this cmspage contain")
+    type: Int @doc(description: "the type of the cms page")
+    category_id: Int @doc(description: "the category id which this cms page has")
+    sort_order: Int @doc(description: "the sort order of the cms page")
+    cms_script: String @doc(description: "the script of the cms page")
+    cms_url: String @doc(description: "the url of the PWA cms page")
+    cms_meta_title: String @doc(description: "the meta title of the cms PWA page")
+    cms_meta_desc: String @doc(description: "the meta cms desc")
+}
+type SimiCategory @doc(description: "data of the simi category"){
+    name: String @doc(description: "name of the category")
+    file_url: String @doc(description: "the url of the image file")
+    filetablet_url: String @doc(description: "the url of the tablet image file")
+    category_id: Int @doc(description: "the category id ")
+    status: Int @doc(description: "the status of this simi category")
+    website_id: Int @doc(description: "the id of the website this category have an effect on")
+    storeview_id: Int @doc(description: "the storeview_id this category have an effect on")
+    sort_order: Int @doc(description: "the sort order of this category")
+    matrix_width_percent: String @doc(description: "the matrrix width percentage")
+    matrix_height_percent: String @doc(description: "The height percentage of the picture")
+    matrix_width_percent_tablet: String @doc(description: "the width percentage of the picture in the tablet form")
+    matrix_height_percent_tablet: String @doc(description: "the height percentage of the picture in the tablet form")
+    matrix_row: Int @doc(description: "row number")
+}
+
+type SimiProductList @doc(description: "the type which return the ProductList information"){
+    listTitle: String @doc(description: "the title name of the product list")
+    ImageUrl: String @doc(description: "the url of the image of the product list")
+    ImageUrlTablet: String @doc(description: "the url of the image of the product list but displayed in tablets")
+    type: Int @doc(description: "the type of this product list")
+    list_Product: String @doc(description: "the product of this list_product")
+    status: Int @doc(description: "the status of this product list")
+    sort_order: Int @doc(description: "the sort order of this product list compared to each other")
+    matrix_width_percent: String @doc(description: "the matrrix width percentage")
+    matrix_height_percent: String @doc(description: "The height percentage of the picture")
+    matrix_width_percent_tablet: String @doc(description: "the width percentage of the picture in the tablet form")
+    matrix_height_percent_tablet: String @doc(description: "the height percentage of the picture in the tablet form")
+    matrix_row: Int @doc(description: "row number")
+    category_id: Int @doc(description: "the category id that this product list hold")
 }
 
 type Mutation {
