@@ -63,7 +63,8 @@ class SimiCMSpage implements ResolverInterface
             }
             // die(var_dump($cmsUrl));
             $cms = [
-                'image_url' => $cmsUrl,
+                'cms_id' => $returnCms[$i]['cms_id'],
+                'cms_image' => $cmsUrl,
                 'cms_title' => $returnCms[$i]['cms_title'],
                 'cms_content' => $returnCms[$i]['cms_content'],
                 'cms_status' => $returnCms[$i]['cms_status'],
@@ -74,13 +75,16 @@ class SimiCMSpage implements ResolverInterface
                 'cms_script' => $returnCms[$i]['cms_script'],
                 'cms_url' => $returnCms[$i]['cms_url'],
                 'cms_meta_title' => $returnCms[$i]['cms_meta_title'],
-                'cms_meta_desc' => $returnCms[$i]['cms_meta_desc']
+                'cms_meta_desc' => $returnCms[$i]['cms_meta_desc'],
+                'entity_id' => $returnCms[$i]['entity_id'],
+                'content_type' => $returnCms[$i]['content_type'],
+                'item_id' => $returnCms[$i]['item_id'],
+                'store_view_id' => $returnCms[$i]['store_view_id']
             ];
             array_push($finalResult, $cms);
             }
         return $finalResult;
         }
-
     }
     //function to sort the array by it's attributes
     private function build_sorter($key) 
