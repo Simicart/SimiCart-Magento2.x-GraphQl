@@ -52,6 +52,7 @@ class SimiCategory implements ResolverInterface
             usort($returnHomeCategory, $this->build_sorter('sort_order'));
             for($i=0; $i<sizeof($returnHomeCategory); $i++)
             {
+            $categoriesUrl = null;
             $categoriesUrlTablet = null;
             try{
                 if ($returnHomeCategory[$i]['simicategory_filename']) {
@@ -67,6 +68,8 @@ class SimiCategory implements ResolverInterface
                     $returnHomeCategory[$i]['height_tablet']      = $imagesize[1];
                     $categoriesFileNameTablet = str_replace("Simiconnector", "",$returnHomeCategory[$i]["simicategory_filename_tablet"]);
                     $categoriesUrlTablet = $this->imageHelper->getBaseUrl() . $categoriesFileNameTablet;
+                } else {
+                    $categoriesUrlTablet = $categoriesUrl;
                 }
             }
             catch(\Exception $e){

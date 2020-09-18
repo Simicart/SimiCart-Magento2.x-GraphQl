@@ -66,7 +66,8 @@ class Banner implements ResolverInterface
             
             //BP is represent for basic path, direct to the root of the folder, in this case it is : /var/www/html/magento2, this return all the attribute of the image
             $imageAttribute = getimagesize(BP . '/pub/media/' . $returnbanner[$i]['banner_name']);
-            
+            $bannerUrl = null;
+            $bannernametablet = null;
             try{
                 if ($returnbanner[$i]['banner_name']) {
                     $imagesize           = getimagesize(BP . '/pub/media/' . $returnbanner[$i]['banner_name']);
@@ -81,6 +82,8 @@ class Banner implements ResolverInterface
                     $returnbanner[$i]['height_tablet']      = $imagesize[1];
                     $bannernametablet = str_replace("Simiconnector", "",$returnbanner[$i]["banner_name_tablet"]);
                     $bannernametablet = $this->imageHelper->getBaseUrl() . $bannernametablet;
+                } else {
+                    $bannernametablet = $bannerUrl;
                 }
             }
             catch(\Exception $e){

@@ -71,6 +71,8 @@ class ProductList implements ResolverInterface
                         $productListFileNameTablet = str_replace("Simiconnector", "",$returnProductList[$i]["list_image_tablet"]);
                         //get the url file by helper
                         $productListUrlTablet = $this->imageHelper->getBaseUrl() . $productListFileNameTablet;
+                    } else {
+                        $productListUrlTablet = $productListUrl;
                     }
                 }
                 catch(\Exception $e){
