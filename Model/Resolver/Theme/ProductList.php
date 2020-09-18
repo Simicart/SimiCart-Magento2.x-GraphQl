@@ -13,7 +13,6 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class ProductList implements ResolverInterface
 {
-	protected $pointDataProvider;
 	protected $storeManager;
 	protected $collectionVisibility;
     protected $imageHelper;
@@ -23,14 +22,12 @@ class ProductList implements ResolverInterface
      * @param DataProvider\Faq $faqRepository
      */
     public function __construct(
-    	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
     	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Helper\Data $helper,
         \Simi\Simiconnector\Model\ResourceModel\Productlist\CollectionFactory $collectionProductList,
         \Simi\Simiconnector\Helper\Productlist $productlistApi
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;
@@ -56,6 +53,8 @@ class ProductList implements ResolverInterface
             usort($returnProductList, $this->build_sorter('sort_order'));
             for($i=0; $i<sizeof($returnProductList); $i++)
             {
+                $productListUrl = null;
+                $productListUrlTablet = null;
                 try{
                     if ($returnProductList[$i]['list_image']) {
                         $imagesize           = getimagesize(BP . '/pub/media/' . $returnProductList[$i]["list_image"]);
@@ -72,6 +71,8 @@ class ProductList implements ResolverInterface
                         $productListFileNameTablet = str_replace("Simiconnector", "",$returnProductList[$i]["list_image_tablet"]);
                         //get the url file by helper
                         $productListUrlTablet = $this->imageHelper->getBaseUrl() . $productListFileNameTablet;
+                    } else {
+                        $productListUrlTablet = $productListUrl;
                     }
                 }
                 catch(\Exception $e){
@@ -101,10 +102,10 @@ class ProductList implements ResolverInterface
                     'content_type' => $returnProductList[$i]['content_type'],
                     'item_id' => $returnProductList[$i]['item_id'],
                     'store_view_id' => $returnProductList[$i]['store_view_id'],
-                    'width' => $returnProductList[$i]['width'],
-                    'height' => $returnProductList[$i]['height'],
-                    'width_tablet' => $returnProductList[$i]['width_tablet'],
-                    'height_tablet' => $returnProductList[$i]['height_tablet'],
+                    'width' => isset($returnProductList[$i]['width'])?$returnProductList[$i]['width']:null,
+                    'height' => isset($returnProductList[$i]['height'])?$returnProductList[$i]['height']:null,
+                    'width_tablet' => isset($returnProductList[$i]['width_tablet'])?$returnProductList[$i]['width_tablet']:null,
+                    'height_tablet' => isset($returnProductList[$i]['height_tablet'])?$returnProductList[$i]['height_tablet']:null,
                     'type_name' => $returnProductList[$i]['type_name']
                 ];
 

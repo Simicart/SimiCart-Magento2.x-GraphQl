@@ -13,7 +13,6 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class SimiCMSpage implements ResolverInterface
 {
-	protected $pointDataProvider;
 	protected $storeManager;
 	protected $collectionVisibility;
     protected $imageHelper;
@@ -22,13 +21,11 @@ class SimiCMSpage implements ResolverInterface
      * @param DataProvider\Faq $faqRepository
      */
     public function __construct(
-    	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
     	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Helper\Data $helper,
         \Simi\Simiconnector\Model\ResourceModel\Cms\CollectionFactory $collectionCMS
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;

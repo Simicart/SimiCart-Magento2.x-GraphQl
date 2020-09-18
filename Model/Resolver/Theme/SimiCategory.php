@@ -13,7 +13,6 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class SimiCategory implements ResolverInterface
 {
-	protected $pointDataProvider;
 	protected $storeManager;
 	protected $collectionVisibility;
     protected $imageHelper;
@@ -23,14 +22,12 @@ class SimiCategory implements ResolverInterface
      * @param DataProvider\Faq $faqRepository
      */
     public function __construct(
-    	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
     	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Helper\Data $helper,
         \Simi\Simiconnector\Model\ResourceModel\Simicategory\CollectionFactory $collectionCategory,
         \Simi\Simiconnector\Model\Api\Homecategories $categoriesApi
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;
@@ -55,7 +52,8 @@ class SimiCategory implements ResolverInterface
             usort($returnHomeCategory, $this->build_sorter('sort_order'));
             for($i=0; $i<sizeof($returnHomeCategory); $i++)
             {
-            
+            $categoriesUrl = null;
+            $categoriesUrlTablet = null;
             try{
                 if ($returnHomeCategory[$i]['simicategory_filename']) {
                     $imagesize           = getimagesize(BP . '/pub/media/' . $returnHomeCategory[$i]['simicategory_filename']);
@@ -70,6 +68,8 @@ class SimiCategory implements ResolverInterface
                     $returnHomeCategory[$i]['height_tablet']      = $imagesize[1];
                     $categoriesFileNameTablet = str_replace("Simiconnector", "",$returnHomeCategory[$i]["simicategory_filename_tablet"]);
                     $categoriesUrlTablet = $this->imageHelper->getBaseUrl() . $categoriesFileNameTablet;
+                } else {
+                    $categoriesUrlTablet = $categoriesUrl;
                 }
             }
             catch(\Exception $e){
@@ -104,10 +104,10 @@ class SimiCategory implements ResolverInterface
                 'matrix_row' => $returnHomeCategory[$i]['matrix_row'],
                 'content_type' => $returnHomeCategory[$i]['content_type'],
                 'store_view_id' => $returnHomeCategory[$i]['store_view_id'],
-                'width' => $returnHomeCategory[$i]['width'],
-                'height' => $returnHomeCategory[$i]['height'],
-                'width_tablet' => $returnHomeCategory[$i]['width_tablet'],
-                'height_tablet' => $returnHomeCategory[$i]['height_tablet'],
+                'width' => isset($returnHomeCategory[$i]['width'])?$returnHomeCategory[$i]['width']:null,
+                'height' => isset($returnHomeCategory[$i]['height'])?$returnHomeCategory[$i]['height']:null,
+                'width_tablet' => isset($returnHomeCategory[$i]['width_tablet'])?$returnHomeCategory[$i]['width_tablet']:null,
+                'height_tablet' => isset($returnHomeCategory[$i]['height_tablet'])?$returnHomeCategory[$i]['height_tablet']:null,
                 'has_children' => $returnHomeCategory[$i]['has_children'],
                 'cat_name' => $returnHomeCategory[$i]['cat_name'],
                 'url_path' =>$returnHomeCategory[$i]['url_path'],

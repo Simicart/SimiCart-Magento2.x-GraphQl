@@ -13,7 +13,6 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class Banner implements ResolverInterface
 {
-	protected $pointDataProvider;
 	protected $storeManager;
 	protected $collectionVisibility;
     protected $collectionBanner;
@@ -23,7 +22,6 @@ class Banner implements ResolverInterface
     protected $productModel;
     
     public function __construct(
-    	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
     	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Model\ResourceModel\Banner\CollectionFactory $collectionBanner,
@@ -31,7 +29,6 @@ class Banner implements ResolverInterface
         \Magento\Catalog\Model\Category $categoryModel,
         \Magento\Catalog\Model\Product $productModel
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->collectionBanner = $collectionBanner;
@@ -69,7 +66,8 @@ class Banner implements ResolverInterface
             
             //BP is represent for basic path, direct to the root of the folder, in this case it is : /var/www/html/magento2, this return all the attribute of the image
             $imageAttribute = getimagesize(BP . '/pub/media/' . $returnbanner[$i]['banner_name']);
-            
+            $bannerUrl = null;
+            $bannernametablet = null;
             try{
                 if ($returnbanner[$i]['banner_name']) {
                     $imagesize           = getimagesize(BP . '/pub/media/' . $returnbanner[$i]['banner_name']);
@@ -84,6 +82,8 @@ class Banner implements ResolverInterface
                     $returnbanner[$i]['height_tablet']      = $imagesize[1];
                     $bannernametablet = str_replace("Simiconnector", "",$returnbanner[$i]["banner_name_tablet"]);
                     $bannernametablet = $this->imageHelper->getBaseUrl() . $bannernametablet;
+                } else {
+                    $bannernametablet = $bannerUrl;
                 }
             }
             catch(\Exception $e){
@@ -130,10 +130,10 @@ class Banner implements ResolverInterface
                 'content_type' => $returnbanner[$i]['content_type'],
                 'item_id' => $returnbanner[$i]['item_id'],
                 'store_view_id' => $returnbanner[$i]['store_view_id'],
-                'width' => $returnbanner[$i]['width'],
-                'height' => $returnbanner[$i]['height'],
-                'width_tablet' =>$returnbanner[$i]['width_tablet'],
-                'height_tablet' => $returnbanner[$i]['height_tablet'],
+                'width' => isset($returnbanner[$i]['width'])?$returnbanner[$i]['width']:null,
+                'height' => isset($returnbanner[$i]['height'])?$returnbanner[$i]['height']:null,
+                'width_tablet' => isset($returnbanner[$i]['width_tablet'])?$returnbanner[$i]['width_tablet']:null,
+                'height_tablet' => isset($returnbanner[$i]['height_tablet'])?$returnbanner[$i]['height_tablet']:null,
                 'has_children' => $returnbanner[$i]['has_children'],
                 'cat_name' => $returnbanner[$i]['cat_name'],
                 'url_path' => $returnbanner[$i]['url_path'],
