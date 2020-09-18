@@ -53,6 +53,8 @@ class ProductList implements ResolverInterface
             usort($returnProductList, $this->build_sorter('sort_order'));
             for($i=0; $i<sizeof($returnProductList); $i++)
             {
+                $productListUrl = null;
+                $productListUrlTablet = null;
                 try{
                     if ($returnProductList[$i]['list_image']) {
                         $imagesize           = getimagesize(BP . '/pub/media/' . $returnProductList[$i]["list_image"]);
@@ -98,10 +100,10 @@ class ProductList implements ResolverInterface
                     'content_type' => $returnProductList[$i]['content_type'],
                     'item_id' => $returnProductList[$i]['item_id'],
                     'store_view_id' => $returnProductList[$i]['store_view_id'],
-                    'width' => $returnProductList[$i]['width'],
-                    'height' => $returnProductList[$i]['height'],
-                    'width_tablet' => $returnProductList[$i]['width_tablet'],
-                    'height_tablet' => $returnProductList[$i]['height_tablet'],
+                    'width' => isset($returnProductList[$i]['width'])?$returnProductList[$i]['width']:null,
+                    'height' => isset($returnProductList[$i]['height'])?$returnProductList[$i]['height']:null,
+                    'width_tablet' => isset($returnProductList[$i]['width_tablet'])?$returnProductList[$i]['width_tablet']:null,
+                    'height_tablet' => isset($returnProductList[$i]['height_tablet'])?$returnProductList[$i]['height_tablet']:null,
                     'type_name' => $returnProductList[$i]['type_name']
                 ];
 
