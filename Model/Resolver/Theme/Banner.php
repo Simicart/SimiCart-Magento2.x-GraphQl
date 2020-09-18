@@ -13,7 +13,6 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class Banner implements ResolverInterface
 {
-	protected $pointDataProvider;
 	protected $storeManager;
 	protected $collectionVisibility;
     protected $collectionBanner;
@@ -23,7 +22,6 @@ class Banner implements ResolverInterface
     protected $productModel;
     
     public function __construct(
-    	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
     	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Model\ResourceModel\Banner\CollectionFactory $collectionBanner,
@@ -31,7 +29,6 @@ class Banner implements ResolverInterface
         \Magento\Catalog\Model\Category $categoryModel,
         \Magento\Catalog\Model\Product $productModel
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->collectionBanner = $collectionBanner;

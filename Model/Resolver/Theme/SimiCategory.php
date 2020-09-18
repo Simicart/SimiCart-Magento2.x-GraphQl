@@ -13,7 +13,6 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class SimiCategory implements ResolverInterface
 {
-	protected $pointDataProvider;
 	protected $storeManager;
 	protected $collectionVisibility;
     protected $imageHelper;
@@ -23,14 +22,12 @@ class SimiCategory implements ResolverInterface
      * @param DataProvider\Faq $faqRepository
      */
     public function __construct(
-    	\Api\RewardPoint\Model\Customer\CustomerPoint $pointDataProvider,
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
     	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Helper\Data $helper,
         \Simi\Simiconnector\Model\ResourceModel\Simicategory\CollectionFactory $collectionCategory,
         \Simi\Simiconnector\Model\Api\Homecategories $categoriesApi
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;
