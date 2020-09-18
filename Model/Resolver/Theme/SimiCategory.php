@@ -52,7 +52,7 @@ class SimiCategory implements ResolverInterface
             usort($returnHomeCategory, $this->build_sorter('sort_order'));
             for($i=0; $i<sizeof($returnHomeCategory); $i++)
             {
-            
+            $categoriesUrlTablet = null;
             try{
                 if ($returnHomeCategory[$i]['simicategory_filename']) {
                     $imagesize           = getimagesize(BP . '/pub/media/' . $returnHomeCategory[$i]['simicategory_filename']);
