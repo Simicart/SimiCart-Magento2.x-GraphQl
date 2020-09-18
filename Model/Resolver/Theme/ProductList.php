@@ -28,7 +28,6 @@ class ProductList implements ResolverInterface
         \Simi\Simiconnector\Model\ResourceModel\Productlist\CollectionFactory $collectionProductList,
         \Simi\Simiconnector\Helper\Productlist $productlistApi
     ) {
-    	$this->pointDataProvider = $pointDataProvider;
     	$this->storeManager = $storeManager;
     	$this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;
