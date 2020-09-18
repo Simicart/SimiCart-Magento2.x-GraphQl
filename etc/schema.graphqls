@@ -9,7 +9,6 @@ type Query {
         simiProductSort: SimiProductSort @doc(description: "SimiProductSort.")
     ): Simiproducts
     @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simiproducts") @doc(description: "The products query searches for products that match the criteria specified in the search and filter attributes")
-
     simiStoreConfig(
         storeId: Int @doc(description: "Change store view id"),
         currency: String @doc(description: "Change currency")
@@ -23,147 +22,11 @@ type Query {
     simiCmspage: [SimiCMSpage] @doc(description: "return the information of the simi CMS") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCMSpage")
 }
 
-type SimiBanner @doc(description: "data of the banner"){
-    banner_id: Int @doc(description: "the id of this banner")
-    banner_name: String @doc(description: "the name of the banner")
-    banner_url: String @doc(description: "the url of the banner")
-    banner_name_tablet: String @doc(description: "the name link of the banner in table form")
-    banner_title: String @doc(description: "the title of the banner")
-    status: String @doc(description: "the status of the banner")
-    website_id: Int @doc(description: "the website id this banner contain")
-    type: Int @doc(description: "the type of this banner")
-    category_id: Int @doc(description: "the product id of this banner")
-    product_id: Int @doc(description: "the product id of this banner")
-    sort_order: Int @doc(description: "the short order of the banner")
-    entity_id: Int @doc(description: "the entity id this banner has")
-    content_type: Int @doc(description: "the content type this banner is")
-    item_id: Int @doc(description: "the item id of this banner")
-    store_view_id: Int @doc(description: "the store view this banner has")
-    width: Int @doc(description: "the width measure of this banner")
-    height: Int @doc(description: "the height measure of this banner")
-    width_tablet: Int @doc(description: "the width measure of this banner in tablet enviroment")
-    height_tablet: Int @doc(description: "the height measure of this banner in tablet enviroment")
-    has_children: Boolean @doc(description: "if the banner has children or not")
-    cat_name: String @doc(description: "cat name of the banner")
-    url_path: String @doc(description: "url path of the categories if the type of the banner is 2, category in app")
-    url_key: String @doc(description: "url key of the banner if it's type is 1, product-in-app")
-    total_banner: Int @doc(description: "how much banner it returns")
-
-}
-
-type SimiCMSpage @doc(description: "return the Cms page data"){
-    cms_id: Int @doc(description: "the cms id ")
-    cms_image: String @doc(description: "the link of the image of this cms")
-    cms_title: String @doc(description: "the title of the cms page")
-    cms_content: String @doc(description: "the content of the cms page")
-    cms_status: Int @doc(description: "the status of the cms page")
-    website_id: Int @doc(description: "the website ID which this cmspage contain")
-    type: Int @doc(description: "the type of the cms page")
-    category_id: Int @doc(description: "the category id which this cms page has")
-    sort_order: Int @doc(description: "the sort order of the cms page")
-    cms_script: String @doc(description: "the script of the cms page")
-    cms_url: String @doc(description: "the url of the PWA cms page")
-    cms_meta_title: String @doc(description: "the meta title of the cms PWA page")
-    cms_meta_desc: String @doc(description: "the meta cms desc")
-    entity_id: Int @doc(description: "the entity id of this cms")
-    content_type: Int @doc(description: "the content type of this cms")
-    item_id: Int @doc(description: "the item id of this cms")
-    store_view_id: Int @doc(description: "the store view id this cms allow to shown up")
-}
-
-type SimiCategory @doc(description: "data of the simi category"){
-    simicategory_id: Int @doc(description: "the id of the simicategories")
-    simicategory_name: String @doc(description: "simicategory name")
-    simicategory_filename: String @doc(description: "the url of the image file")
-    simicategory_filename_tablet: String @doc(description: "the url of the tablet image file")
-    category_id: Int @doc(description: "the category id ")
-    status: Int @doc(description: "the status of this simi category")
-    website_id: Int @doc(description: "the id of the website this category have an effect on")
-    storeview_id: Int @doc(description: "the storeview_id this category have an effect on")
-    sort_order: Int @doc(description: "the sort order of this category")
-    matrix_width_percent: String @doc(description: "the matrrix width percentage")
-    matrix_height_percent: String @doc(description: "The height percentage of the picture")
-    matrix_width_percent_tablet: String @doc(description: "the width percentage of the picture in the tablet form")
-    matrix_height_percent_tablet: String @doc(description: "the height percentage of the picture in the tablet form")
-    matrix_row: Int @doc(description: "row number")
-    content_type: String @doc(description: "the content type of the category")
-    store_view_id: String @doc(description: "the store view id this categories contain")
-    width: Int @doc(description: "the width measure of this category")
-    height: Int @doc(description: "the height measure of this category")
-    width_tablet: Int @doc(description: "the width measure of this category in tablet enviroment")
-    height_tablet: Int @doc(description: "the height measure of this category in tablet enviroment")
-    has_children: Boolean @doc(description: "if the category has children or not")
-    cat_name: String @doc(description: "cat name of the category")
-    url_path: String @doc(description: "url path of the categories if the type of the category is 2, category in app")
-    total_category: Int @doc(description: "how much category it returns")
-}
-
-type SimiProductList @doc(description: "the type which return the ProductList information"){
-    productlist_id: Int @doc(description: "the id of this productlist")
-    list_title: String @doc(description: "the title name of the product list")
-    list_image: String @doc(description: "the url of the image of the product list")
-    list_image_tablet: String @doc(description: "the url of the image of the product list but displayed in tablets")
-    list_type: Int @doc(description: "the type of this product list")
-    list_products: String @doc(description: "the product of this list_product")
-    list_status: Int @doc(description: "the status of this product list")
-    sort_order: Int @doc(description: "the sort order of this product list compared to each other")
-    matrix_width_percent: String @doc(description: "the matrrix width percentage")
-    matrix_height_percent: String @doc(description: "The height percentage of the picture")
-    matrix_width_percent_tablet: String @doc(description: "the width percentage of the picture in the tablet form")
-    matrix_height_percent_tablet: String @doc(description: "the height percentage of the picture in the tablet form")
-    matrix_row: Int @doc(description: "row number")
-    category_id: Int @doc(description: "the category id that this product list hold")
-    entity_id: Int @doc(description: "the entity id this product list page contain")
-    content_type: Int @doc(description: "the content type this product list page is")
-    item_id: Int @doc(description: "the item id this product list has")
-    store_view_id: Int @doc(description: "the store viewe id this product list allow to shown up")
-    width: Int @doc(description: "original width size of the image")
-    height: Int @doc(description: "original height size of the imagee")
-    width_tablet: Int @doc(description: "original width size of the image on tablet form")
-    height_tablet: Int @doc(description: "original height size of the image on tablet form")
-    type_name: String @doc(description: "the type name of this product list")
-}
-
 type Mutation {
     subscribe(email: String!): Subscribe @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Subscribe") @doc(description: "Subscribe email to magento subscribed list for guest.")
     wishlist(product: Int!, data: String): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistResolver") @doc(description: "Add wishlist item to customer's wishlist.")
     wishlistToCart(item_id: Int!, cart_id: String!): WishlistCart @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistToCartResolver") @doc(description: "Add wishlist item to cart.")
     wishlistRemoveItem(item_id: Int!): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistRemoveItemResolver") @doc(description: "Remove wishlist item from customer's wishlist.")
-}
-
-type CustomerOrder {
-    prices: OrderTotal @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\TotalsResolver") @doc(description: "Total segment of the order totals.")
-    items: [OrderItem] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\ItemsResolver") @doc(description: "Customer order items.")
-    billing_address: CustomerAddress @doc(description: "Customer order address.")
-    shipping_address: CustomerAddress @doc(description: "Customer order address.")
-    shipping_method: String @doc(description: "Customer order shipping method.")
-    payment_method: String @doc(description: "Customer order payment method title.")
-    is_virtual: Boolean @doc(description: "Customer order is virtual.")
-}
-
-type OrderItem @doc(description: "Customer order item.") {
-    id: Int
-    name: String
-    url_key: String
-    image: String
-    sku: String
-    price: Float
-    qty: Int
-    discount: Float
-    row_total: Float
-}
-
-type OrderTotal {
-    sub_total: Money
-    grand_total: Money
-    tax: Money
-    discount: Money
-    discounts: [Discount] @doc(description:"An array of applied discounts") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\DiscountResolver")
-}
-
-type WishlistCart {
-    wishlist: Wishlist
-    cart: Cart
 }
 
 type Simiproducts @doc(description: "The Products object is the top-level object returned in a product search") {
@@ -475,4 +338,141 @@ type SimiContactSMS {
 
 type SimiContactWebsite {
     contact_website : String
+}
+
+
+type SimiBanner @doc(description: "data of the banner"){
+    banner_id: Int @doc(description: "the id of this banner")
+    banner_name: String @doc(description: "the name of the banner")
+    banner_url: String @doc(description: "the url of the banner")
+    banner_name_tablet: String @doc(description: "the name link of the banner in table form")
+    banner_title: String @doc(description: "the title of the banner")
+    status: String @doc(description: "the status of the banner")
+    website_id: Int @doc(description: "the website id this banner contain")
+    type: Int @doc(description: "the type of this banner")
+    category_id: Int @doc(description: "the product id of this banner")
+    product_id: Int @doc(description: "the product id of this banner")
+    sort_order: Int @doc(description: "the short order of the banner")
+    entity_id: Int @doc(description: "the entity id this banner has")
+    content_type: Int @doc(description: "the content type this banner is")
+    item_id: Int @doc(description: "the item id of this banner")
+    store_view_id: Int @doc(description: "the store view this banner has")
+    width: Int @doc(description: "the width measure of this banner")
+    height: Int @doc(description: "the height measure of this banner")
+    width_tablet: Int @doc(description: "the width measure of this banner in tablet enviroment")
+    height_tablet: Int @doc(description: "the height measure of this banner in tablet enviroment")
+    has_children: Boolean @doc(description: "if the banner has children or not")
+    cat_name: String @doc(description: "cat name of the banner")
+    url_path: String @doc(description: "url path of the categories if the type of the banner is 2, category in app")
+    url_key: String @doc(description: "url key of the banner if it's type is 1, product-in-app")
+    total_banner: Int @doc(description: "how much banner it returns")
+
+}
+
+type SimiCMSpage @doc(description: "return the Cms page data"){
+    cms_id: Int @doc(description: "the cms id ")
+    cms_image: String @doc(description: "the link of the image of this cms")
+    cms_title: String @doc(description: "the title of the cms page")
+    cms_content: String @doc(description: "the content of the cms page")
+    cms_status: Int @doc(description: "the status of the cms page")
+    website_id: Int @doc(description: "the website ID which this cmspage contain")
+    type: Int @doc(description: "the type of the cms page")
+    category_id: Int @doc(description: "the category id which this cms page has")
+    sort_order: Int @doc(description: "the sort order of the cms page")
+    cms_script: String @doc(description: "the script of the cms page")
+    cms_url: String @doc(description: "the url of the PWA cms page")
+    cms_meta_title: String @doc(description: "the meta title of the cms PWA page")
+    cms_meta_desc: String @doc(description: "the meta cms desc")
+    entity_id: Int @doc(description: "the entity id of this cms")
+    content_type: Int @doc(description: "the content type of this cms")
+    item_id: Int @doc(description: "the item id of this cms")
+    store_view_id: Int @doc(description: "the store view id this cms allow to shown up")
+}
+
+type SimiCategory @doc(description: "data of the simi category"){
+    simicategory_id: Int @doc(description: "the id of the simicategories")
+    simicategory_name: String @doc(description: "simicategory name")
+    simicategory_filename: String @doc(description: "the url of the image file")
+    simicategory_filename_tablet: String @doc(description: "the url of the tablet image file")
+    category_id: Int @doc(description: "the category id ")
+    status: Int @doc(description: "the status of this simi category")
+    website_id: Int @doc(description: "the id of the website this category have an effect on")
+    storeview_id: Int @doc(description: "the storeview_id this category have an effect on")
+    sort_order: Int @doc(description: "the sort order of this category")
+    matrix_width_percent: String @doc(description: "the matrrix width percentage")
+    matrix_height_percent: String @doc(description: "The height percentage of the picture")
+    matrix_width_percent_tablet: String @doc(description: "the width percentage of the picture in the tablet form")
+    matrix_height_percent_tablet: String @doc(description: "the height percentage of the picture in the tablet form")
+    matrix_row: Int @doc(description: "row number")
+    content_type: String @doc(description: "the content type of the category")
+    store_view_id: String @doc(description: "the store view id this categories contain")
+    width: Int @doc(description: "the width measure of this category")
+    height: Int @doc(description: "the height measure of this category")
+    width_tablet: Int @doc(description: "the width measure of this category in tablet enviroment")
+    height_tablet: Int @doc(description: "the height measure of this category in tablet enviroment")
+    has_children: Boolean @doc(description: "if the category has children or not")
+    cat_name: String @doc(description: "cat name of the category")
+    url_path: String @doc(description: "url path of the categories if the type of the category is 2, category in app")
+    total_category: Int @doc(description: "how much category it returns")
+}
+
+type SimiProductList @doc(description: "the type which return the ProductList information"){
+    productlist_id: Int @doc(description: "the id of this productlist")
+    list_title: String @doc(description: "the title name of the product list")
+    list_image: String @doc(description: "the url of the image of the product list")
+    list_image_tablet: String @doc(description: "the url of the image of the product list but displayed in tablets")
+    list_type: Int @doc(description: "the type of this product list")
+    list_products: String @doc(description: "the product of this list_product")
+    list_status: Int @doc(description: "the status of this product list")
+    sort_order: Int @doc(description: "the sort order of this product list compared to each other")
+    matrix_width_percent: String @doc(description: "the matrrix width percentage")
+    matrix_height_percent: String @doc(description: "The height percentage of the picture")
+    matrix_width_percent_tablet: String @doc(description: "the width percentage of the picture in the tablet form")
+    matrix_height_percent_tablet: String @doc(description: "the height percentage of the picture in the tablet form")
+    matrix_row: Int @doc(description: "row number")
+    category_id: Int @doc(description: "the category id that this product list hold")
+    entity_id: Int @doc(description: "the entity id this product list page contain")
+    content_type: Int @doc(description: "the content type this product list page is")
+    item_id: Int @doc(description: "the item id this product list has")
+    store_view_id: Int @doc(description: "the store viewe id this product list allow to shown up")
+    width: Int @doc(description: "original width size of the image")
+    height: Int @doc(description: "original height size of the imagee")
+    width_tablet: Int @doc(description: "original width size of the image on tablet form")
+    height_tablet: Int @doc(description: "original height size of the image on tablet form")
+    type_name: String @doc(description: "the type name of this product list")
+}
+
+type CustomerOrder {
+    prices: OrderTotal @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\TotalsResolver") @doc(description: "Total segment of the order totals.")
+    items: [OrderItem] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\ItemsResolver") @doc(description: "Customer order items.")
+    billing_address: CustomerAddress @doc(description: "Customer order address.")
+    shipping_address: CustomerAddress @doc(description: "Customer order address.")
+    shipping_method: String @doc(description: "Customer order shipping method.")
+    payment_method: String @doc(description: "Customer order payment method title.")
+    is_virtual: Boolean @doc(description: "Customer order is virtual.")
+}
+
+type OrderItem @doc(description: "Customer order item.") {
+    id: Int
+    name: String
+    url_key: String
+    image: String
+    sku: String
+    price: Float
+    qty: Int
+    discount: Float
+    row_total: Float
+}
+
+type OrderTotal {
+    sub_total: Money
+    grand_total: Money
+    tax: Money
+    discount: Money
+    discounts: [Discount] @doc(description:"An array of applied discounts") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\DiscountResolver")
+}
+
+type WishlistCart {
+    wishlist: Wishlist
+    cart: Cart
 }
