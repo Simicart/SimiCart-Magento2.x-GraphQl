@@ -17,39 +17,29 @@ class QRproduct implements ResolverInterface
 {
 
 	protected $storeManager;
-	protected $collectionVisibility;
-    protected $collectionBanner;
     protected $imageHelper;
     protected $qrcollection;
-    protected $categoryModel;
     protected $productModel;
     protected $simibarcodeModel;
     protected $_productRepository;
-    protected $productFactory;
     protected $searchApiCriteriaBuilder;
 
     public function __construct(
     	\Magento\Store\Model\StoreManagerInterface $storeManager,
-    	\Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Helper\Data $helper,
-        \Magento\Catalog\Model\Category $categoryModel,
         \Magento\Catalog\Model\Product $productModel,
         \Simi\Simiconnector\Model\ResourceModel\Simibarcode\CollectionFactory $QRcollection,
         \Simi\Simiconnector\Model\Simibarcode $simibarcodeModel,
         \Magento\Catalog\Model\ProductRepository $productRepository,
-        \Magento\Catalog\Model\ProductFactory $productFactory,
         SearchCriteriaBuilder $searchApiCriteriaBuilder = null,
         Search $searchQuery
     ) {
     	$this->storeManager = $storeManager;
-    	$this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;
         $this->productModel = $productModel;
-        $this->categoryModel = $categoryModel;
         $this->qrcollection = $QRcollection;
         $this->simibarcodeModel = $simibarcodeModel;
         $this->_productRepository = $productRepository;
-        $this->productFactory = $productFactory;
         $this->searchApiCriteriaBuilder = $searchApiCriteriaBuilder ??    
         \Magento\Framework\App\ObjectManager::getInstance()->get(SearchCriteriaBuilder::class);
         $this->searchQuery = $searchQuery;
@@ -77,9 +67,6 @@ class QRproduct implements ResolverInterface
             'pageSize' => 20,
             'currentPage' => 1
         ];
-
-
-        $product = $this->productFactory->create();
         //all information of the product
 
         /* $productInfo = $product->loadByAttribute('sku', $result['product_sku'])->getData();
@@ -107,9 +94,5 @@ class QRproduct implements ResolverInterface
             'product_info' => $product
         ];
         return $finalResult;
-    }
-    public function getProductBySku($sku)
-    {
-        return $this->_productRepository->get($sku);
     }
 }
