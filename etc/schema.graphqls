@@ -21,6 +21,29 @@ type Query {
     simiCategories: [SimiCategory] @doc(description: "return the information of a list of home categories") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCategory")
     simiProductlist: [SimiProductList] @doc(description: "return the information of a list of productList") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\ProductList")
     simiCmspage: [SimiCMSpage] @doc(description: "return the information of the simi CMS") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCMSpage")
+    productQR(
+        filter: QRProductInput @doc(description: "Identifies which QR product attributes to search for and return.")
+        barcode: String @doc(description: "input the barcode to return the QR product")
+        qrcode: String @doc(description: "input the QR code to return the QR product")
+    ): QRproduct @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\QRproduct") @doc(description: "The productQR query searches for QR products that match the criteria specified in the search and filter attributes.")
+
+}
+
+type QRproduct @doc(description: "the QR product information"){
+    barcode_id: Int @doc(description: "id of this bar code")
+    barcode: String @doc(description: "barcode name")
+    qrcode: String @doc(description: "content of the qr code")
+    barcode_status: Int @doc(description: "barcode status")
+    product_entity_id: Int @doc(description: "product entity id")
+    product_name: String @doc(description: "the name of the product")
+    product_sku: String @doc(description: "sku of the product")
+    created_date: String @doc(description: "date create of the product")
+    product_info: [ProductInterface] @doc(description: "information of the product")
+}
+
+input QRProductInput @doc(description: "the input for the filter QR product"){
+    barcode: FilterTypeInput @doc(description: "the barcode to search for the product")
+    qr_code: FilterTypeInput @doc(description: "the QR code too search for the product")
 }
 
 type Mutation {
