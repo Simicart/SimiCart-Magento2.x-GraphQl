@@ -32,7 +32,7 @@ class QRproduct implements ResolverInterface
         \Simi\Simiconnector\Model\Simibarcode $simibarcodeModel,
         \Magento\Catalog\Model\ProductRepository $productRepository,
         SearchCriteriaBuilder $searchApiCriteriaBuilder = null,
-        Search $searchQuery,
+        Search $searchQuery
     ) {
         $this->imageHelper = $helper;
         $this->productModel = $productModel;
