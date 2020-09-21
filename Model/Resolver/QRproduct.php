@@ -16,7 +16,7 @@ use Simi\SimiconnectorGraphQl\Model\Resolver\Products\Query\Search;
 class QRproduct implements ResolverInterface
 {
 
-	protected $storeManager;
+    protected $storeManager;
     protected $imageHelper;
     protected $qrcollection;
     protected $productModel;
@@ -25,7 +25,7 @@ class QRproduct implements ResolverInterface
     protected $searchApiCriteriaBuilder;
 
     public function __construct(
-    	\Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Simi\Simiconnector\Helper\Data $helper,
         \Magento\Catalog\Model\Product $productModel,
         \Simi\Simiconnector\Model\ResourceModel\Simibarcode\CollectionFactory $QRcollection,
@@ -34,7 +34,7 @@ class QRproduct implements ResolverInterface
         SearchCriteriaBuilder $searchApiCriteriaBuilder = null,
         Search $searchQuery
     ) {
-    	$this->storeManager = $storeManager;
+        $this->storeManager = $storeManager;
         $this->imageHelper = $helper;
         $this->productModel = $productModel;
         $this->qrcollection = $QRcollection;
@@ -73,26 +73,29 @@ class QRproduct implements ResolverInterface
         $_product = $this->getProductBySku($result['product_sku']);
         $attributes = $_product->getAttributes();// All Product Attributes */
         // die(var_dump(json_decode(json_encode($attributes))));
-
-        $productFields = (array)$info->getFieldSelection(1);
-        $includeAggregations = isset($productFields['filters']) || isset($productFields['aggregations']);
+        
+        $includeAggregations = false;
         $searchCriteria = $this->searchApiCriteriaBuilder->build($sku, $includeAggregations);
         $searchResult = $this->searchQuery->getResult($searchCriteria, $info, $sku);
-        $product = $searchResult->getProductsSearchResult();
-        // die(var_dump(json_decode(json_encode($product))));
+        $products = $searchResult->getProductsSearchResult();
+        
 
-        $finalResult =
-        [
-            'barcode_id' => $result['barcode_id'],
-            'barcode' => $result['barcode'],
-            'qrcode' => $result['qrcode'],
-            'barcode_status' => $result['barcode_status'],
-            'product_entity_id' => $result['product_entity_id'],
-            'product_name' => $result['product_name'],
-            'product_sku' => $result['product_sku'],
-            'created_date' =>$result['created_date'],
-            'product_info' => $product
-        ];
-        return $finalResult;
+        foreach ($products as $product){
+            $finalResult =
+            [
+                'barcode_id' => $result['barcode_id'],
+                'barcode' => $result['barcode'],
+                'qrcode' => $result['qrcode'],
+                'barcode_status' => $result['barcode_status'],
+                'product_entity_id' => $result['product_entity_id'],
+                'product_name' => $result['product_name'],
+                'product_sku' => $result['product_sku'],
+                'created_date' =>$result['created_date'],
+                'product_info' => $product
+            ];
+            return $finalResult;
+        }
+
+        
     }
 }

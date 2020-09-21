@@ -38,7 +38,7 @@ type QRproduct @doc(description: "the QR product information"){
     product_name: String @doc(description: "the name of the product")
     product_sku: String @doc(description: "sku of the product")
     created_date: String @doc(description: "date create of the product")
-    product_info: [ProductInterface] @doc(description: "information of the product")
+    product_info: ProductInterface @doc(description: "information of the product")
 }
 
 input QRProductInput @doc(description: "the input for the filter QR product"){
