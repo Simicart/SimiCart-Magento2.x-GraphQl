@@ -62,11 +62,7 @@ class QRproduct implements ResolverInterface
         $attributes = $_product->getAttributes();// All Product Attributes */
         // die(var_dump(json_decode(json_encode($attributes))));
         $name = [
-            'filter'=> [
-                'name'=>[
-                    'match' => $result['product_name']
-                ]
-            ],
+            'search' => $result['product_name'],
             'pageSize'=>20,
             'currentPage' =>1
         ];
