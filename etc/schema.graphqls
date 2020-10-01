@@ -28,6 +28,7 @@ type Mutation {
     wishlist(product: Int!, data: String): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistResolver") @doc(description: "Add wishlist item to customer's wishlist.")
     wishlistToCart(item_id: Int!, cart_id: String!): WishlistCart @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistToCartResolver") @doc(description: "Add wishlist item to cart.")
     wishlistRemoveItem(item_id: Int!): Wishlist @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\WishlistRemoveItemResolver") @doc(description: "Remove wishlist item from customer's wishlist.")
+	contactusFormSubmit(input: ContactusInput!): ContactusOutput @resolver(class: "\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\ContactUsResolver") @doc(description:"Contact us form")
 }
 
 type Simiproducts @doc(description: "The Products object is the top-level object returned in a product search") {
@@ -502,4 +503,16 @@ type SimiCustomerOrder @doc(description: "Order mapping fields") {
 
 type CustomerOrders {
 	items: [SimiCustomerOrder] @doc(description: "Array of orders")
+}
+
+input ContactusInput {
+	name: String @doc(description: "The customer's full name")
+	email: String @doc(description: "The customer's email address")
+	phone: String @doc(description: "The customer's Telephone")
+	message: String @doc(description: "The customer's message")
+	company: String @doc(description: "The customer's company")
+}
+
+type ContactusOutput {
+	success_message: String @doc(description: "Success Message")
 }
