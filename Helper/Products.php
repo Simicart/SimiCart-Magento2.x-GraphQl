@@ -27,6 +27,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $stockHelper;
     public $categoryModelFactory;
     public $productModelFactory;
+    public $currencyFactory;
 
     const XML_PATH_RANGE_STEP = 'catalog/layered_navigation/price_range_step';
     const MIN_RANGE_POWER     = 10;
@@ -45,7 +46,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Catalog\Helper\Image $imageHelper,
         \Magento\CatalogInventory\Helper\Stock $stockHelper,
         \Magento\Catalog\Model\Category $categoryModelFactory,
-        \Magento\Catalog\Model\Product $productModelFactory
+        \Magento\Catalog\Model\Product $productModelFactory,
+        \Magento\Directory\Model\CurrencyFactory $currencyFactory
     ) {
 
         $this->simiObjectManager = $simiObjectManager;
@@ -61,6 +63,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->stockHelper = $stockHelper;
         $this->categoryModelFactory = $categoryModelFactory;
         $this->productModelFactory = $productModelFactory;
+        $this->currencyFactory = $currencyFactory;
         parent::__construct($context);
     }
 
@@ -109,12 +112,16 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         foreach ($params['filter']['layer'] as $key => $value) {
             if ($key == 'price') {
+                $currencyCodeFrom = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
+                $currencyCodeTo = $this->storeManager->getStore()->getBaseCurrency()->getCode();
+                $rate = $this->currencyFactory->create()->load($currencyCodeTo)->getAnyRate($currencyCodeFrom);
+
                 $value  = explode('-', $value);
                 $priceFilter = array();
                 if (isset($value[0]))
-                    $priceFilter['from'] = $value[0];
+                    $priceFilter['from'] = $value[0] / $rate;
                 if (isset($value[0]))
-                    $priceFilter['to'] = $value[1];
+                    $priceFilter['to'] = $value[1] / $rate;
                 $collection->addFieldToFilter('price', $priceFilter);
             } else {
                 if ($key == 'category_id') {
