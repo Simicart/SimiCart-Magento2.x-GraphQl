@@ -144,6 +144,7 @@ class ProductSearch
                 ->load($args['filter']['category_id']['eq']);
             $collection = $category->getProductCollection();
             $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH)));
+            $helper->category = $category;
         } else if (!$is_search || !$collection) {
             $category = $this->categoryFactory->create()
                 ->load($this->storeManager->getStore()->getRootCategoryId());
