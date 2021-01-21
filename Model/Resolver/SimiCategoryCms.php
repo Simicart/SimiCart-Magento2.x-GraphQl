@@ -20,9 +20,11 @@ class SimiCategoryCms implements ResolverInterface
 
     public function __construct(
         \Simi\SimiconnectorGraphQl\Model\Resolver\DataProvider\SimiCategoryCmsDataProvider $cmsCategory
-    ) {
+    )
+    {
         $this->cmsCategory = $cmsCategory;
     }
+
     /**
      * @inheritdoc
      */
@@ -32,9 +34,10 @@ class SimiCategoryCms implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    ) {
+    )
+    {
         $categoryId = null;
-        if($value && isset($value['id']) && $value['id']) {
+        if ($value && isset($value['id']) && $value['id']) {
             $categoryId = $value['id'];
         }
         return $this->cmsCategory->getCategoryCms($categoryId);

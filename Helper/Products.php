@@ -12,7 +12,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $simiObjectManager;
     public $storeManager;
     public $builderQuery;
-    public $data        = [];
+    public $data = [];
     public $sortOrders = [];
     public $category;
     public $productStatus;
@@ -30,7 +30,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $currencyFactory;
 
     const XML_PATH_RANGE_STEP = 'catalog/layered_navigation/price_range_step';
-    const MIN_RANGE_POWER     = 10;
+    const MIN_RANGE_POWER = 10;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -48,12 +48,13 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Catalog\Model\Category $categoryModelFactory,
         \Magento\Catalog\Model\Product $productModelFactory,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory
-    ) {
+    )
+    {
 
         $this->simiObjectManager = $simiObjectManager;
-        $this->scopeConfig      = $scopeConfigInterface;
-        $this->storeManager     = $storeManager;
-        $this->productStatus     = $productStatus;
+        $this->scopeConfig = $scopeConfigInterface;
+        $this->storeManager = $storeManager;
+        $this->productStatus = $productStatus;
         $this->productVisibility = $productVisibility;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
@@ -98,7 +99,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function loadCategoryWithId($id)
     {
-        $categoryModel    = $this->categoryModelFactory->create()->load($id);
+        $categoryModel = $this->categoryModelFactory->create()->load($id);
         return $categoryModel;
     }
 
@@ -116,7 +117,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $currencyCodeTo = $this->storeManager->getStore()->getBaseCurrency()->getCode();
                 $rate = $this->currencyFactory->create()->load($currencyCodeTo)->getAnyRate($currencyCodeFrom);
 
-                $value  = explode('-', $value);
+                $value = explode('-', $value);
                 $priceFilter = array();
                 if (isset($value[0]))
                     $priceFilter['from'] = $value[0] / $rate;
@@ -135,12 +136,12 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                     $this->filteredAttributes[$key] = $value;
                     $collection->addCategoriesFilter(['in' => $value]);
-                }elseif ($key == 'size' || $key == 'color') {
-                    $this->filteredAttributes[$key] = $value;                    
+                } elseif ($key == 'size' || $key == 'color') {
+                    $this->filteredAttributes[$key] = $value;
                     # code...
                     $productIds = [];
-                    $collectionChid         = $this->productCollectionFactory->create();
-                  
+                    $collectionChid = $this->productCollectionFactory->create();
+
                     $collectionChid->addAttributeToSelect('*')
                         ->addStoreFilter()
                         ->addAttributeToFilter('status', 1)
@@ -148,7 +149,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     if (is_array($value)) {
                         $insetArray = array();
                         foreach ($value as $child_value) {
-                            $insetArray[] = array('finset'=> array($child_value));
+                            $insetArray[] = array('finset' => array($child_value));
                         }
                         $collectionChid->addAttributeToFilter($key, $insetArray);
                     } else
@@ -166,13 +167,13 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                         $productIds[] = $product->getParentId();
                     }
 
-                    $collection->addAttributeToFilter('entity_id', array('in' => $productIds));                                        
+                    $collection->addAttributeToFilter('entity_id', array('in' => $productIds));
                 } else {
                     $this->filteredAttributes[$key] = $value;
                     if (is_array($value)) {
                         $insetArray = array();
                         foreach ($value as $child_value) {
-                            $insetArray[] = array('finset'=> array($child_value));
+                            $insetArray[] = array('finset' => array($child_value));
                         }
                         $collection->addAttributeToFilter($key, $insetArray);
                     } else
@@ -195,8 +196,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $collection = $this->builderQuery;
         }
         if (!$params) {
-            $data       = $this->getData();
-            $params = isset($data['params'])?$data['params']:array();
+            $data = $this->getData();
+            $params = isset($data['params']) ? $data['params'] : array();
         }
         $attributeCollection = $this->attributeCollectionFactory->create();
         $attributeCollection
@@ -209,7 +210,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $attributeCollection->addFieldToFilter('is_filterable_in_search', 1);
 
         $allProductIds = $collection->getAllIds();
-        $arrayIDs      = [];
+        $arrayIDs = [];
         foreach ($allProductIds as $allProductId) {
             $arrayIDs[$allProductId] = '1';
         }
@@ -222,7 +223,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->category) {
             $childrenCategories = $this->category->getChildrenCategories();
             $collection->addCountToCategories($childrenCategories);
-            $filters            = [];
+            $filters = [];
             foreach ($childrenCategories as $childCategory) {
                 if ($childCategory->getProductCount()) {
                     $filters[] = [
@@ -235,17 +236,16 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
             $layerFilters[] = [
                 'attribute' => 'category_id',
-                'title'     => __('Categories'),
-                'filter'    => ($filters),
+                'title' => __('Categories'),
+                'filter' => ($filters),
             ];
         }
 
         $paramArray = (array)$params;
         $selectedFilters = $this->_getSelectedFilters();
-        $selectableFilters = count($allProductIds)?
-            $this->_getSelectableFilters($collection, $paramArray, $selectedFilters, $layerFilters):
-            array()
-        ;
+        $selectableFilters = count($allProductIds) ?
+            $this->_getSelectableFilters($collection, $paramArray, $selectedFilters, $layerFilters) :
+            array();
 
         $layerArray = ['layer_filter' => $selectableFilters];
         if (count($selectedFilters) > 0) {
@@ -257,27 +257,27 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function _getSelectedFilters()
     {
-        $selectedFilters   = [];
+        $selectedFilters = [];
         foreach ($this->filteredAttributes as $key => $value) {
             if (($key == 'category_id') && is_array($value) &&
-                (count($value)>=2)) {
+                (count($value) >= 2)) {
                 $value = $value[1];
                 $category = $this->loadCategoryWithId($value);
                 $selectedFilters[] = [
-                    'value'=>$value,
-                    'label'=>$category->getName(),
+                    'value' => $value,
+                    'label' => $category->getName(),
                     'attribute' => 'category_id',
-                    'title'     => __('Categories'),
+                    'title' => __('Categories'),
                 ];
                 continue;
             }
             if (($key == 'price') && is_array($value) &&
-                (count($value)>=2)) {
+                (count($value) >= 2)) {
                 $selectedFilters[] = [
-                    'value'=> implode('-', $value),
-                    'label'=> $this->_renderRangeLabel($value[0], $value[1]),
+                    'value' => implode('-', $value),
+                    'label' => $this->_renderRangeLabel($value[0], $value[1]),
                     'attribute' => 'price',
-                    'title'     => __('Price')
+                    'title' => __('Price')
                 ];
                 continue;
             }
@@ -291,7 +291,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     if ($layerFilter['value'] == $value) {
                         $layerFilter['attribute'] = $key;
                         $layerFilter['title'] = $attribute->getDefaultFrontendLabel();
-                        $selectedFilters[]    = $layerFilter;
+                        $selectedFilters[] = $layerFilter;
                     }
                 }
         }
@@ -320,19 +320,19 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function _filterByAtribute($collection, $attributeCollection, &$titleFilters, &$layerFilters, $arrayIDs)
     {
-        $childProductsIds      = [];
+        $childProductsIds = [];
         if ($arrayIDs && count($arrayIDs)) {
             $childProducts = $this->productCollectionFactory->create()
                 ->addAttributeToSelect('*')
                 ->addAttributeToFilter('type_id', 'simple');
             $select = $childProducts->getSelect();
             $select->joinLeft(
-                    array('link_table' => $collection->getResource()->getTable('catalog_product_super_link')),
-                    'link_table.product_id = e.entity_id',
-                    array('product_id', 'parent_id')
-                );
+                array('link_table' => $collection->getResource()->getTable('catalog_product_super_link')),
+                'link_table.product_id = e.entity_id',
+                array('product_id', 'parent_id')
+            );
             $select = $childProducts->getSelect();
-            $select->where("link_table.parent_id IN (".implode(',', array_keys($arrayIDs)).")");
+            $select->where("link_table.parent_id IN (" . implode(',', array_keys($arrayIDs)) . ")");
             foreach ($childProducts->getAllIds() as $allProductId) {
                 $childProductsIds[$allProductId] = '1';
             }
@@ -341,7 +341,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         foreach ($attributeCollection as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $attributeOptions = [];
-            $attributeValues  = $collection->getAllAttributeValues($attribute->getAttributeCode());
+            $attributeValues = $collection->getAllAttributeValues($attribute->getAttributeCode());
             if (in_array($attribute->getDefaultFrontendLabel(), $titleFilters)) {
                 continue;
             }
@@ -355,7 +355,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     $optionIds = explode(',', $optionIds[0]);
                     foreach ($optionIds as $optionId) {
                         if (isset($attributeOptions[$optionId])) {
-                            $attributeOptions[$optionId] ++;
+                            $attributeOptions[$optionId]++;
                         } else {
                             $attributeOptions[$optionId] = 1;
                         }
@@ -369,7 +369,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 if (isset($option['value']) && isset($attributeOptions[$option['value']])
                     && $attributeOptions[$option['value']]) {
                     $option['count'] = $attributeOptions[$option['value']];
-                    $filters[]       = $option;
+                    $filters[] = $option;
                 }
             }
 
@@ -377,8 +377,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $titleFilters[] = $attribute->getDefaultFrontendLabel();
                 $layerFilters[] = [
                     'attribute' => $attribute->getAttributeCode(),
-                    'title'     => $attribute->getDefaultFrontendLabel(),
-                    'filter'    => $filters,
+                    'title' => $attribute->getDefaultFrontendLabel(),
+                    'filter' => $filters,
                 ];
             }
         }
@@ -396,10 +396,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $collection->addPriceData();
         $maxPrice = $collection->getMaxPrice();
 
-        $index    = 1;
+        $index = 1;
         $counts = [];
         do {
-            $range  = pow(10, strlen(floor($maxPrice)) - $index);
+            $range = pow(10, strlen(floor($maxPrice)) - $index);
             $counts = $collection->getAttributeValueCountByRange('price', $range);
             $index++;
         } while ($range > self::MIN_RANGE_POWER && count($counts) < 2 && $index <= 2);
@@ -410,7 +410,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             unset($counts['']);
             $newCounts = [];
             foreach ($counts as $key => $count) {
-                $newCounts[$key+1] = $counts[$key];
+                $newCounts[$key + 1] = $counts[$key];
             }
             $counts = $newCounts;
         }
@@ -427,7 +427,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function _renderRangeLabel($fromPrice, $toPrice)
     {
-        $helper             = $this->priceHelper;
+        $helper = $this->priceHelper;
         $formattedFromPrice = $helper->currency($fromPrice, true, false);
         if ($toPrice === '') {
             return __('%1 and above', $formattedFromPrice);

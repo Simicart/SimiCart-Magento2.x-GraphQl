@@ -28,21 +28,23 @@ class CustomerOrderDetailsResolver implements ResolverInterface
      */
     public function __construct(
         OrderFactory $orderFactory
-    ) {
+    )
+    {
         $this->orderFactory = $orderFactory;
     }
 
     /**
      * @inheritdoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null) {
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    {
         $customerId = $context->getUserId();
 
         /* Guest checking */
         if (!$customerId && 0 === $customerId) {
             throw new GraphQlAuthorizationException(__('The current user cannot perform operations on customer order.'));
         }
-        
+
         if (!isset($args['order_number'])) {
             throw new GraphQlAuthorizationException(__('The order number is required param.'));
         }
@@ -51,14 +53,14 @@ class CustomerOrderDetailsResolver implements ResolverInterface
         $storeId = (string)$context->getExtensionAttributes()->getStore()->getId();
         /*$order = $this->orderFactory->create()->loadByIncrementIdAndStoreId($orderNumber, $storeId);*/
 
-	    // get order without storeId.
-	    $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
+        // get order without storeId.
+        $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
 
         $billingAddress = null;
         $shippingAddress = null;
 
         $addresses = $order->getAddresses();
-        foreach($addresses as $addressModel){
+        foreach ($addresses as $addressModel) {
             $addressData = [
                 'id' => $addressModel->getId(),
                 "customer_id" => $addressModel->getCustomerId(),

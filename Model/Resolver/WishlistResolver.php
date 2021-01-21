@@ -60,7 +60,8 @@ class WishlistResolver implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    ) {
+    )
+    {
         $customerId = $context->getUserId();
 
         /* Guest checking */
@@ -81,7 +82,7 @@ class WishlistResolver implements ResolverInterface
         }
 
         $store = $context->getExtensionAttributes()->getStore();
-        $storeId = (int) $store->getId();
+        $storeId = (int)$store->getId();
         $product = $this->productRepository->getById($args['product'], false, $storeId);
         $buyRequest = null;
         if (isset($args['data'])) {

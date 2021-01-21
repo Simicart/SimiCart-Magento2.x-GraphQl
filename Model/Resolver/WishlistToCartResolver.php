@@ -75,7 +75,8 @@ class WishlistToCartResolver implements ResolverInterface
         GetCartForUser $getCartForUser,
         Cart $cart,
         CustomerCart $customerCart
-    ) {
+    )
+    {
         $this->wishlistResource = $wishlistResource;
         $this->wishlistFactory = $wishlistFactory;
         $this->wishlistItem = $wishlistItem;
@@ -88,7 +89,8 @@ class WishlistToCartResolver implements ResolverInterface
     /**
      * @inheritdoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null) {
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    {
         if (!isset($args['item_id']) || empty($args['item_id'])) {
             throw new GraphQlInputException(__('Required parameter "item_id" is missing'));
         }
@@ -112,8 +114,8 @@ class WishlistToCartResolver implements ResolverInterface
             $wishlistOption = $this->wishlistOptFactory->create()->setItem($this->wishlistItem);
             $optionCollection = $wishlistOption->getCollection();
             $optionCollection->addItemFilter($this->wishlistItem);
-                // ->addFieldToFilter('code', 'info_buyRequest');
-            foreach($optionCollection as $option){
+            // ->addFieldToFilter('code', 'info_buyRequest');
+            foreach ($optionCollection as $option) {
                 $this->wishlistItem->addOption($option);
             }
             $result = $this->wishlistItem->addToCart($this->cart, true); // must add to wishlist with full request options before

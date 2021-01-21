@@ -19,50 +19,52 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactoryInterface;
  */
 class Orders implements ResolverInterface
 {
-	/**
-	 * @var CollectionFactoryInterface
-	 */
-	private $collectionFactory;
+    /**
+     * @var CollectionFactoryInterface
+     */
+    private $collectionFactory;
 
-	/**
-	 * @param CollectionFactoryInterface $collectionFactory
-	 */
-	public function __construct(
-		CollectionFactoryInterface $collectionFactory
-	) {
-		$this->collectionFactory = $collectionFactory;
-	}
+    /**
+     * @param CollectionFactoryInterface $collectionFactory
+     */
+    public function __construct(
+        CollectionFactoryInterface $collectionFactory
+    )
+    {
+        $this->collectionFactory = $collectionFactory;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function resolve(
-		Field $field,
-		$context,
-		ResolveInfo $info,
-		array $value = null,
-		array $args = null
-	) {
-		/** @var ContextInterface $context */
-		if (false === $context->getExtensionAttributes()->getIsCustomer()) {
-			throw new GraphQlAuthorizationException(__('The current customer isn\'t authorized.'));
-		}
+    /**
+     * @inheritdoc
+     */
+    public function resolve(
+        Field $field,
+        $context,
+        ResolveInfo $info,
+        array $value = null,
+        array $args = null
+    )
+    {
+        /** @var ContextInterface $context */
+        if (false === $context->getExtensionAttributes()->getIsCustomer()) {
+            throw new GraphQlAuthorizationException(__('The current customer isn\'t authorized.'));
+        }
 
-		$items = [];
-		$orders = $this->collectionFactory->create($context->getUserId());
+        $items = [];
+        $orders = $this->collectionFactory->create($context->getUserId());
 
-		/** @var \Magento\Sales\Model\Order $order */
-		foreach ($orders as $order) {
-			$items[] = [
-				'id' => $order->getId(),
-				'increment_id' => $order->getIncrementId(),
-				'order_number' => $order->getIncrementId(),
-				'created_at' => $order->getCreatedAt(),
-				'grand_total' => $order->getGrandTotal(),
-				'status' => $order->getStatus(),
-				'order_currency' => $order->getOrderCurrencyCode()
-			];
-		}
-		return ['items' => $items];
-	}
+        /** @var \Magento\Sales\Model\Order $order */
+        foreach ($orders as $order) {
+            $items[] = [
+                'id' => $order->getId(),
+                'increment_id' => $order->getIncrementId(),
+                'order_number' => $order->getIncrementId(),
+                'created_at' => $order->getCreatedAt(),
+                'grand_total' => $order->getGrandTotal(),
+                'status' => $order->getStatus(),
+                'order_currency' => $order->getOrderCurrencyCode()
+            ];
+        }
+        return ['items' => $items];
+    }
 }

@@ -45,7 +45,8 @@ class ItemsResolver implements ResolverInterface
     public function __construct(
         OrderFactory $orderFactory,
         Image $imageHelper
-    ) {
+    )
+    {
         $this->orderFactory = $orderFactory;
         $this->imageHelper = $imageHelper;
     }
@@ -53,25 +54,26 @@ class ItemsResolver implements ResolverInterface
     /**
      * @inheritdoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null) {
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    {
 
         $order = $value['model'];
         $currency = $order->getOrderCurrencyCode();
         $items = [];
-        foreach($order->getAllVisibleItems() as $item){
+        foreach ($order->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
             $imageUrl = $this->imageHelper->init($product, 'product_page_image_small')
                 ->setImageFile($product->getImage())->resize(100, 100)->getUrl();
             $items[] = [
-                'id'            => $item->getId(),
-                'name'          => $item->getName(),
-                'url_key'       => $product->getUrlKey(),
-                'image'         => $imageUrl,
-                'sku'           => $item->getSku(),
-                'price'         => (float) $item->getPrice(),
-                'qty'           => $item->getQtyOrdered(),
-                'discount'      => (float) $item->getDiscountAmount(),
-                'row_total'     => (float) $item->getRowTotal()
+                'id' => $item->getId(),
+                'name' => $item->getName(),
+                'url_key' => $product->getUrlKey(),
+                'image' => $imageUrl,
+                'sku' => $item->getSku(),
+                'price' => (float)$item->getPrice(),
+                'qty' => $item->getQtyOrdered(),
+                'discount' => (float)$item->getDiscountAmount(),
+                'row_total' => (float)$item->getRowTotal()
             ];
         }
 

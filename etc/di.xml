@@ -1,16 +1,21 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\GraphQl\Query\Resolver\Argument\FieldEntityAttributesPool">
         <arguments>
             <argument name="attributesInstances" xsi:type="array">
-                <item name="simiproducts" xsi:type="object">Magento\CatalogGraphQl\Model\Resolver\Products\FilterArgument\ProductEntityAttributesForAst</item>
+                <item name="simiproducts" xsi:type="object">
+                    Magento\CatalogGraphQl\Model\Resolver\Products\FilterArgument\ProductEntityAttributesForAst
+                </item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\QuoteGraphQl\Model\Cart\GetCartForUser">
-        <plugin name="simiconnectorgrapqhl_get_cart_for_user_plugin" type="Simi\SimiconnectorGraphQl\Plugin\GetCartForUser" />
+        <plugin name="simiconnectorgrapqhl_get_cart_for_user_plugin"
+                type="Simi\SimiconnectorGraphQl\Plugin\GetCartForUser"/>
     </type>
-	<type name="Magento\QuoteGraphQl\Model\Cart\BuyRequest\CustomizableOptionsDataProvider">
-		<plugin name="simiconnectorgrapqhl_buy_request_customization_options_data_provider_plugin" type="Simi\SimiconnectorGraphQl\Plugin\CustomizableOptionsDataProvider" />
-	</type>
+    <type name="Magento\QuoteGraphQl\Model\Cart\BuyRequest\CustomizableOptionsDataProvider">
+        <plugin name="simiconnectorgrapqhl_buy_request_customization_options_data_provider_plugin"
+                type="Simi\SimiconnectorGraphQl\Plugin\CustomizableOptionsDataProvider"/>
+    </type>
 </config>

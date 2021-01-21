@@ -65,7 +65,8 @@ class Search
         SearchCriteriaInterfaceFactory $searchCriteriaFactory,
         \Magento\CatalogGraphQl\Model\Resolver\Products\Query\FieldSelection $fieldSelection,
         ProductSearch $productsProvider
-    ) {
+    )
+    {
         $this->search = $search;
         $this->searchResultFactory = $searchResultFactory;
         $this->pageSizeProvider = $pageSize;
@@ -86,7 +87,8 @@ class Search
         SearchCriteriaInterface $searchCriteria,
         ResolveInfo $info,
         array $args //simiconnector changing
-    ): SearchResult {
+    ): SearchResult
+    {
         $queryFields = $this->fieldSelection->getProductsFieldSelection($info);
 
         $realPageSize = $searchCriteria->getPageSize();

@@ -28,14 +28,16 @@ class TotalsResolver implements ResolverInterface
      */
     public function __construct(
         OrderFactory $orderFactory
-    ) {
+    )
+    {
         $this->orderFactory = $orderFactory;
     }
 
     /**
      * @inheritdoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null) {
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    {
 
         $order = $value['model'];
         // $store = $context->getExtensionAttributes()->getStore();
@@ -43,10 +45,10 @@ class TotalsResolver implements ResolverInterface
         $currency = $order->getOrderCurrencyCode();
 
         return [
-            'sub_total' => ['value' => (float) $order->getSubtotal(), 'currency' => $currency],
-            'grand_total' => ['value' => (float) $order->getGrandTotal(), 'currency' => $currency],
-            'tax' => ['value'=> (float) $order->getTaxAmount(), 'currency' => $currency],
-            'discount' => ['value'=> (float) $order->getDiscountAmount(), 'currency' => $currency],
+            'sub_total' => ['value' => (float)$order->getSubtotal(), 'currency' => $currency],
+            'grand_total' => ['value' => (float)$order->getGrandTotal(), 'currency' => $currency],
+            'tax' => ['value' => (float)$order->getTaxAmount(), 'currency' => $currency],
+            'discount' => ['value' => (float)$order->getDiscountAmount(), 'currency' => $currency],
             'model' => $order,
         ];
     }

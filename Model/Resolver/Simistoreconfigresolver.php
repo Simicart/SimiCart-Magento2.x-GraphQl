@@ -27,7 +27,8 @@ class Simistoreconfigresolver implements ResolverInterface
      */
     public function __construct(
         Simistoreconfigdataprovider $storeConfigsDataProvider
-    ) {
+    )
+    {
         $this->storeConfigDataProvider = $storeConfigsDataProvider;
     }
 
@@ -40,7 +41,8 @@ class Simistoreconfigresolver implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    ) {
+    )
+    {
         return $this->storeConfigDataProvider->getSimiStoreConfigData($args);
     }
 }

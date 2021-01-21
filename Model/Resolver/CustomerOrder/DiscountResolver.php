@@ -28,14 +28,16 @@ class DiscountResolver implements ResolverInterface
      */
     public function __construct(
         OrderFactory $orderFactory
-    ) {
+    )
+    {
         $this->orderFactory = $orderFactory;
     }
 
     /**
      * @inheritdoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null) {
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    {
 
         $order = $value['model'];
         // $store = $context->getExtensionAttributes()->getStore();
@@ -46,7 +48,7 @@ class DiscountResolver implements ResolverInterface
             $discounts = [
                 [
                     'amount' => [
-                        'value' => (float) $order->getDiscountAmount(),
+                        'value' => (float)$order->getDiscountAmount(),
                         'currency' => $currency
                     ],
                     'label' => __('Discount')

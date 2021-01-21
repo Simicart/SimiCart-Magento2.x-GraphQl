@@ -77,7 +77,8 @@ class ProductSearch
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Registry $registry
-    ) {
+    )
+    {
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->collectionPreProcessor = $collectionPreProcessor;
@@ -104,7 +105,8 @@ class ProductSearch
         SearchResultInterface $searchResult,
         array $attributes = [],
         array $args //simiconnector changing
-    ): SearchResultsInterface {
+    ): SearchResultsInterface
+    {
         /** @var Collection $collection */
         // $collection = $this->collectionFactory->create();
 
@@ -161,7 +163,7 @@ class ProductSearch
 
         //filter by graphql attribute filter (excluded search and category)
         if ($args && isset($args['filter'])) {
-            foreach ($args['filter'] as $attr=>$value) {
+            foreach ($args['filter'] as $attr => $value) {
                 if ($attr != 'category_id' && $attr != 'q') {
                     $collection->addAttributeToFilter($attr, $value);
                 }
@@ -189,8 +191,8 @@ class ProductSearch
                     if (isset($layer_filter['filter']) && $count = count($layer_filter['filter'])) {
                         $filtersubOptions = array();
                         foreach ($layer_filter['filter'] as $filtersubOption) {
-                            $filtersubOption['value_string'] = (string) $filtersubOption['value'];
-                            $filtersubOption['items_count'] = (int) $filtersubOption['count'];
+                            $filtersubOption['value_string'] = (string)$filtersubOption['value'];
+                            $filtersubOption['items_count'] = (int)$filtersubOption['count'];
                             $filtersubOptions[] = $filtersubOption;
                         }
                         $simiFilterOptions[] = array(
@@ -225,11 +227,11 @@ class ProductSearch
             if ($args['simiProductSort']['attribute'] == 'most_viewed')
                 $this->applySimiViewCountSort($collection, $args['simiProductSort']['direction']);
             elseif ($args['simiProductSort']['attribute'] == 'top_rated')
-	            $this->applySimiTopRatedSort($collection, $args['simiProductSort']['direction']);
+                $this->applySimiTopRatedSort($collection, $args['simiProductSort']['direction']);
             else
                 $collection->setOrder($args['simiProductSort']['attribute'], $args['simiProductSort']['direction']);
         } else if (isset($args['sort'])) {
-            foreach ($args['sort'] as $atr=>$dir) {
+            foreach ($args['sort'] as $atr => $dir) {
                 $collection->setOrder($atr, $dir);
             }
         }
@@ -247,7 +249,8 @@ class ProductSearch
         return $searchResults;
     }
 
-    public function applySimiViewCountSort($collection, $dir) {
+    public function applySimiViewCountSort($collection, $dir)
+    {
         $resource = $this->resourceConnection;
         $reportEventTable = $collection->getResource()->getTable('report_event');
         $conn = $resource->getConnection('catalog');
@@ -258,23 +261,24 @@ class ProductSearch
         $collection->getSelect()->columns(
             ['views' => $subSelect]
         )->order(
-            'views '  . $dir
+            'views ' . $dir
         );
     }
 
-	public function applySimiTopRatedSort($collection, $dir) {
-		$collection->joinField(
-			'rating_summary',
-			'review_entity_summary',
-			'rating_summary',
-			'entity_pk_value=entity_id',
-			array(
-				'entity_type' => 1,
-				'store_id'    => $this->storeManager->getStore()->getId()
-			),
-			'left'
-		);
-		$collection->getSelect()->order( 'rating_summary ' . $dir );
-	}
+    public function applySimiTopRatedSort($collection, $dir)
+    {
+        $collection->joinField(
+            'rating_summary',
+            'review_entity_summary',
+            'rating_summary',
+            'entity_pk_value=entity_id',
+            array(
+                'entity_type' => 1,
+                'store_id' => $this->storeManager->getStore()->getId()
+            ),
+            'left'
+        );
+        $collection->getSelect()->order('rating_summary ' . $dir);
+    }
 
 }

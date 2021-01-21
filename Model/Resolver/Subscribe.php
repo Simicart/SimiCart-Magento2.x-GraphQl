@@ -64,7 +64,8 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
         EmailValidator $emailValidator = null,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         ScopeConfigInterface $scopeConfig
-    ) {
+    )
+    {
         $this->_objectManager = $objectManager;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->emailValidator = $emailValidator ?: ObjectManager::getInstance()->get(EmailValidator::class);
@@ -92,31 +93,32 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    ){
-        try{
+    )
+    {
+        try {
             $email = $args['email'];
             $this->validateEmailFormat($email);
             $this->validateGuestSubscription();
             $this->validateEmailAvailable($email);
-    
+
             $subscriber = $this->_subscriberFactory->create()->loadByEmail($email);
             if ($subscriber->getId()
-                && (int) $subscriber->getSubscriberStatus() === Subscriber::STATUS_SUBSCRIBED
+                && (int)$subscriber->getSubscriberStatus() === Subscriber::STATUS_SUBSCRIBED
             ) {
                 throw new LocalizedException(
                     __('This email address is already subscribed.')
                 );
             }
-    
-            $status = (int) $this->_subscriberFactory->create()->subscribe($email);
+
+            $status = (int)$this->_subscriberFactory->create()->subscribe($email);
 
             return [
-                'status'  => $status,
+                'status' => $status,
                 'message' => $this->getSuccessMessage($status)
             ];
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return [
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => $e->getMessage()
             ];
         }
@@ -174,7 +176,7 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
         $websiteId = $this->_storeManager->getStore()->getWebsiteId();
         if ($this->_customerSession->isLoggedIn()
             && ($this->_customerSession->getCustomerDataObject()->getEmail() !== $email
-            && !$this->customerAccountManagement->isEmailAvailable($email, $websiteId))
+                && !$this->customerAccountManagement->isEmailAvailable($email, $websiteId))
         ) {
             throw new LocalizedException(
                 __('This email address is already assigned to another user.')

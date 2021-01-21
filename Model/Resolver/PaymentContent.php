@@ -26,7 +26,8 @@ class PaymentContent implements ResolverInterface
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PaymentInformationManagementInterface $informationManagement
-    ) {
+    )
+    {
         $this->scopeConfig = $scopeConfig;
         $this->informationManagement = $informationManagement;
     }
