@@ -8,13 +8,13 @@ type Query {
         sort: ProductSortInput @doc(description: "Specifies which attribute to sort on, and whether to return the results in ascending or descending order."),
         simiProductSort: SimiProductSort @doc(description: "SimiProductSort.")
     ): Simiproducts
-    @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simiproducts") @doc(description: "The products query searches for products that match the criteria specified in the search and filter attributes")
+    @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simiproducts") @doc(description: "The products query searches for products that match the criteria specified in the search and filter attributes") @cache(cacheIdentity: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\Identity")
     simiStoreConfig(
         storeId: Int @doc(description: "Change store view id"),
         currency: String @doc(description: "Change currency")
     ): SimiStoreConfig @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simistoreconfigresolver") @doc(description: "The store config query")
     simiStoreGroup : [ SimiStoreGroupData ] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simigroupresolver") @doc(description: "Manually return Store Group Data before magento provide")
-    simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details")
+    simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details") @cache(cacheIdentity: "Magento\\CatalogGraphQl\\Model\\Resolver\\Category\\CategoryTreeIdentity")
     customerOrder(order_number: String!): CustomerOrder @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrderDetailsResolver") @doc(description: "Get customer order details by order_number")
 	customerOrders: CustomerOrders @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Orders") @doc(description: "List of customer orders") @cache(cacheable: false)
 	simiBanner: [SimiBanner] @doc(description: "return the information of the banner which match the current store view") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\Banner")
