@@ -30,11 +30,11 @@ class SimiContactUsDataprovider
         $this->formKey = $formKey;
     }
 
-    public function contactUs($name, $email, $phone, $message, $company)
+    public function contactUs($input)
     {
         $thanks_message = [];
         try {
-            $this->sendEmail($name, $email, $phone, $message, $company);
+            $this->sendEmail($input);
         } catch (LocalizedException $e) {
         }
         $thanks_message['success_message'] = __('Thanks for contacting us with your comments and questions. We\'ll respond to you very soon.');
@@ -42,19 +42,14 @@ class SimiContactUsDataprovider
         return $thanks_message;
     }
 
-    private function sendEmail($name, $email, $phone, $message, $company)
+    private function sendEmail($input)
     {
-        $form_data = [];
-        $form_data['name'] = $name;
-        $form_data['email'] = $email;
-        $form_data['telephone'] = $phone;
-        $form_data['comment'] = $message;
-        $form_data['company'] = $company;
+        $form_data = $input;
         $form_data['hideit'] = "";
         $form_data['form_key'] = $this->getFormKey();
 
         $this->mail->send(
-            $email,
+            $input['email'],
             ['data' => new DataObject($form_data)]
         );
     }

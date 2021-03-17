@@ -39,21 +39,8 @@ class ContactUsResolver implements ResolverInterface
         if (!isset($args['input'])) {
             throw new GraphQlInputException(__('Specify the "input" value.'));
         }
-
-        $name = $args['input']['name'];
-        $email = $args['input']['email'];
-        $phone = $args['input']['phone'];
-        $message = $args['input']['message'];
-        $company = $args['input']['company'];
-
         try {
-            return $this->contactUsDataProvider->contactUs(
-                $name,
-                $email,
-                $phone,
-                $message,
-                $company
-            );
+            return $this->contactUsDataProvider->contactUs($args['input']);
         } catch (LocalizedException $e) {
             throw new GraphQlInputException(__($e->getMessage()), $e);
         }

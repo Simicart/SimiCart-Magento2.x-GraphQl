@@ -234,6 +234,12 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                         ->getStoreConfig('simiconnector/general/show_discount_label_in_product'),
                     'show_size_in_compare' => $this
                         ->getStoreConfig('siminiaconfig/compareconfig/show_size_in_compare'),
+                    'footer_title1' => $this
+                        ->getStoreConfig('siminiaconfig/footer_link/ft_title1'),
+                    'footer_title2' => $this
+                        ->getStoreConfig('siminiaconfig/footer_link/ft_title2'),
+                    'footer_link' => $this
+                        ->getStoreConfig('siminiaconfig/footer_link/ft_link'),
                 ],
                 'cataloginventory' => [
                     'cataloginventory_item_options_manage_stock' => $this
@@ -273,33 +279,33 @@ class Simistoreconfigdataprovider extends DataProviderInterface
 
         if ($this->serializer) {
             $contactEmails = $this->getStoreConfig('siminiaconfig/contactus/email');
+            $arrayContactEmails = [];
             if ($contactEmails) {
                 $contactEmails = $this->serializer->unserialize($contactEmails);
-                $arrayContactEmails = [];
                 foreach ($contactEmails as $contactEmail) {
                     $arrayContactEmails[] = $contactEmail;
                 }
             }
             $contactHotlines = $this->getStoreConfig('siminiaconfig/contactus/hotline');
+            $arrayContactHotlines = [];
             if ($contactHotlines) {
                 $contactHotlines = $this->serializer->unserialize($contactHotlines);
-                $arrayContactHotlines = [];
                 foreach ($contactHotlines as $contactHotline) {
                     $arrayContactHotlines[] = $contactHotline;
                 }
             }
             $contactSms = $this->getStoreConfig('siminiaconfig/contactus/sms');
+            $arrayContactSms = [];
             if ($contactSms) {
                 $contactSms = $this->serializer->unserialize($contactSms);
-                $arrayContactSms = [];
                 foreach ($contactSms as $contactSmsIt) {
                     $arrayContactSms[] = $contactSmsIt;
                 }
             }
             $contactWebsites = $this->getStoreConfig('siminiaconfig/contactus/website');
+            $arrayContactWebsites = [];
             if ($contactWebsites) {
                 $contactWebsites = $this->serializer->unserialize($contactWebsites);
-                $arrayContactWebsites = [];
                 foreach ($contactWebsites as $contactWebsite) {
                     $arrayContactWebsites[] = $contactWebsite;
                 }
