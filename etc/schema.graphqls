@@ -516,3 +516,13 @@ input ContactusInput {
 type ContactusOutput {
 	success_message: String @doc(description: "Success Message")
 }
+
+interface CartItemInterface {
+    simi_cart_item_data: SimiCartItemData @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Cart\\Cartitemstock")
+}
+
+type SimiCartItemData {
+    stock_status: Boolean
+    stock_error_message: String
+    child_product_sku: String
+}
