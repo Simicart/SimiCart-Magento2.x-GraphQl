@@ -121,6 +121,7 @@ type SimiStoreConfigDetails {
     pwacontactus : SimiStoreConfigDetailsPWAContactUs  @doc(description: "Store config PWA Contactus")
     instant_contact : SimiStoreConfigDetailsInstantContact  @doc(description: "Store config Instant Contact")
 	rating_form: [SimiStoreConfigRatingForm] @doc(description: "Store config from rating criterias")
+    analytics: SimiStoreConfigAnalytics @doc(description: "Store config Analytics")
 }
 
 type SimiStoreConfigDetailsBase {
@@ -156,6 +157,7 @@ type SimiStoreConfigDetailsBase {
     title_prefix : String
     title_suffix : String
     default_keywords : String
+    time_offset: String
 }
 
 type SimiStoreConfigDetailsSales {
@@ -230,6 +232,11 @@ type SimiStoreConfigDetailsInstantContact {
     website : String
     style : String
     activecolor : String
+}
+
+type SimiStoreConfigAnalytics {
+    google_analytics_active: String
+    google_analytics_account: String
 }
 
 type SimiStoreConfigRatingForm {

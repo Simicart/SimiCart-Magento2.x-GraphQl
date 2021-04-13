@@ -117,6 +117,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'title_prefix' => $this->getStoreConfig('design/head/title_prefix'),
                 'title_suffix' => $this->getStoreConfig('design/head/title_suffix'),
                 'default_keywords' => $this->getStoreConfig('design/head/default_keywords'),
+                'time_offset' => $this->getTimeOffset(),
             ],
             'sales' => [
                 'sales_reorder_allow' => $this->getStoreConfig('sales/reorder/allow'),
@@ -273,6 +274,10 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'style' => $this->getStoreConfig("simiconnector/instant_contact/style"),
                 'activecolor' => $this->getStoreConfig("simiconnector/instant_contact/icon_color"),
             ],
+            'analytics'  => [
+                'google_analytics_active' => $this->getStoreConfig('google/analytics/active'),
+                'google_analytics_account' => $this->getStoreConfig('google/analytics/account'),
+            ],
             'rating_form' => $this->getFormReviewCriterias()
         );
 
@@ -413,5 +418,14 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         }
 
         return $rates;
+    }
+
+    private function getTimeOffset()
+    {
+        $timeZone = $this->getStoreConfig('general/locale/timezone');
+        $dateStore = new \DateTime("now", new \DateTimeZone($timeZone));
+        $dateUtc = new \DateTime("now", new \DateTimeZone("UTC"));
+        $timeOffset = (int)$dateStore->format('H') - (int)$dateUtc->format('H');
+        return (string)$timeOffset;
     }
 }
