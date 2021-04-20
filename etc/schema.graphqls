@@ -21,6 +21,7 @@ type Query {
     simiCategories: [SimiCategory] @doc(description: "return the information of a list of home categories") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCategory")
     simiProductlist: [SimiProductList] @doc(description: "return the information of a list of productList") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\ProductList")
     simiCmspage: [SimiCMSpage] @doc(description: "return the information of the simi CMS") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCMSpage")
+    simiCheckUserIsAuthed (cart_id: String): SimiUserIsAuthed @resolver(class:"\\Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Cart\\SimiUserIsAuthed") @cache(cacheable: false)
 }
 
 type Mutation {
@@ -532,4 +533,9 @@ type SimiCartItemData {
     stock_status: Boolean
     stock_error_message: String
     child_product_sku: String
+}
+
+type SimiUserIsAuthed {
+    token_valid: Boolean
+    cart_editable: Boolean
 }
