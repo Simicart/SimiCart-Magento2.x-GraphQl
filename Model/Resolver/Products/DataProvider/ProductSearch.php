@@ -129,6 +129,10 @@ class ProductSearch
          * apply filter
          */
         $is_search = 0;
+        $is_details = false;
+        if ($args && (isset($args['filter']['url_key']['eq']) || isset($args['filter']['sku']['eq']))) {
+            $is_details = true;
+        }
         //filter by search query
         if ($args && isset($args['search']) && $args['search']) {
             $is_search = 1;
@@ -184,7 +188,7 @@ class ProductSearch
         $helper->filteredAttributes = [];
 
         //get simi_filter options
-        if ($simiProductFilters = $helper->getLayerNavigator($collection, $params)) {
+        if (!$is_details && ($simiProductFilters = $helper->getLayerNavigator($collection, $params))) {
             $simiFilterOptions = array();
             if (isset($simiProductFilters['layer_filter'])) {
                 foreach ($simiProductFilters['layer_filter'] as $layer_filter) {

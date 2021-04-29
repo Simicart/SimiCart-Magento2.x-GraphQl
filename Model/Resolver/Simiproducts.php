@@ -121,6 +121,11 @@ class Simiproducts implements ResolverInterface
             );
         }
 
+        $is_details = false;
+        if ($args && (isset($args['filter']['url_key']['eq']) || isset($args['filter']['sku']['eq']))) {
+            $is_details = true;
+        }
+
         //get product children fields queried
         $productFields = (array)$info->getFieldSelection(1);
         $includeAggregations = isset($productFields['filters']) || isset($productFields['aggregations']);
@@ -147,7 +152,7 @@ class Simiproducts implements ResolverInterface
         foreach ($products as $index => $product) {
             $productModel = $product['model'];
             if ($productModel->getId()) {
-                if (count($products) > 1) { //listing
+                if (!$is_details) { //listing
                     /*$attributes = $productModel->toArray();
                     if (isset($attributes['description']))
                         unset($attributes['description']);*/
