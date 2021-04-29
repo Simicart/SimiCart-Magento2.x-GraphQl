@@ -49,6 +49,7 @@ interface ProductInterface {
 
 interface CategoryInterface {
     simiCategoryCms: SimiCategoryCms  @doc(description: "Get Cms Config For Category") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiCategoryCms")
+    simi_cat_image: String @doc(description: "Cate Image to Avoid exception")   @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Category\\SimiCateImage")
 }
 
 type AvailablePaymentMethod {
@@ -538,4 +539,15 @@ type SimiCartItemData {
 type SimiUserIsAuthed {
     token_valid: Boolean
     cart_editable: Boolean
+}
+
+
+type Cart {
+    simi_totals: [SimiTotals] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Cart\\SimiTotals")
+}
+
+type SimiTotals {
+    code: String
+    value: Float
+    currency: String
 }
