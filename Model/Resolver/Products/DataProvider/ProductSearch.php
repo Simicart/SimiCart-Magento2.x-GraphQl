@@ -138,7 +138,8 @@ class ProductSearch
             $is_search = 1;
             $helper->is_search = 1;
             $params['filter']['q'] = $args['search'];
-            $helper->getSearchProducts($collection, $params);
+            $collection = $this->collectionFactory->create();
+            $this->getSearchProducts($collection, $params, $searchResult, $searchCriteria, $attributes);
             if (!isset($args['sort']) || $args['sort']) {
                 $collection->setOrder('relevance', 'desc');
             }
@@ -283,6 +284,34 @@ class ProductSearch
             'left'
         );
         $collection->getSelect()->order('rating_summary ' . $dir);
+    }
+    
+
+    public function getSearchProducts(&$collection, $params, $searchResult, $searchCriteria, $attributes)
+    {
+        $this->getSearchResultsApplier($searchResult, $collection, [])->apply();
+        $this->collectionPreProcessor->process($collection, $searchCriteria, $attributes);
+    }
+    /**
+     * Create searchResultApplier
+     *
+     * @param SearchResultInterface $searchResult
+     * @param Collection $collection
+     * @param array $orders
+     * @return SearchResultApplierInterface
+     */
+    private function getSearchResultsApplier(
+        SearchResultInterface $searchResult,
+        Collection $collection,
+        array $orders
+    ): SearchResultApplierInterface {
+        return $this->searchResultApplierFactory->create(
+            [
+                'collection' => $collection,
+                'searchResult' => $searchResult,
+                'orders' => $orders
+            ]
+        );
     }
 
 }

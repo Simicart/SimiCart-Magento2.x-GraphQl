@@ -182,14 +182,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-
-    public function getSearchProducts(&$collection, $params)
-    {
-        $searchCollection = $this->searchCollection;
-        $searchCollection->addSearchFilter($params['filter']['q']);
-        $collection = $searchCollection;
-    }
-
+    
     public function getLayerNavigator($collection = null, $params = null)
     {
         if (!$collection) {
