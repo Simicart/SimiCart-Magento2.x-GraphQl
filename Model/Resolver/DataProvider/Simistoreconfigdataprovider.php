@@ -127,6 +127,8 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'sales_totals_sort_weee' => $this->getStoreConfig('sales/totals_sort/weee'),
                 'sales_totals_sort_tax' => $this->getStoreConfig('sales/totals_sort/tax'),
                 'sales_totals_sort_grand_total' => $this->getStoreConfig('sales/totals_sort/grand_total'),
+                'sales_minimum_order_active' => $this->getStoreConfig('sales/minimum_order/active'),
+                'sales_minimum_order_amount' => $this->getStoreConfig('sales/minimum_order/amount')
             ],
             'checkout' => [
                 'enable_guest_checkout' => $this->getStoreConfig('checkout/options/guest_checkout'),
