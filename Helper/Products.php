@@ -118,12 +118,12 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $rate = $this->currencyFactory->create()->load($currencyCodeTo)->getAnyRate($currencyCodeFrom);
 
                 $value = explode('-', $value);
-                $priceFilter = array();
-                if (isset($value[0]))
-                    $priceFilter['from'] = $value[0] / $rate;
-                if (isset($value[0]))
-                    $priceFilter['to'] = $value[1] / $rate;
-                $collection->addFieldToFilter('price', $priceFilter);
+	            if ( isset( $value[0] ) && isset( $value[1] ) ) {
+		            $priceFrom = $value[0] / $rate;
+		            $priceTo   = $value[1] / $rate;
+		            $collection->getSelect()->where( "price_index.final_price > " . $priceFrom )
+		                       ->where( "price_index.final_price < " . $priceTo );
+	            }
             } else {
                 if ($key == 'category_id') {
                     $cat_filtered = true;
