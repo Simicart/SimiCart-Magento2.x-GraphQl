@@ -199,6 +199,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             //->addFieldToFilter('used_in_product_listing', 1) //cody comment out jun152019
             //->addFieldToFilter('is_visible_on_front', 1) //cody comment out jun152019
         ;
+        $attributeCollection->addFieldToFilter('attribute_code', ['nin' => ['price']]);
         if ($this->is_search)
             $attributeCollection->addFieldToFilter('is_filterable_in_search', 1);
 
@@ -330,11 +331,12 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $childProductsIds[$allProductId] = '1';
             }
         }
-
+        $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         foreach ($attributeCollection as $attribute) {
+
             $attributeCode = $attribute->getAttributeCode();
             $attributeOptions = [];
-            $attributeValues = $collection->getAllAttributeValues($attribute->getAttributeCode());
+            $attributeValues = $this->getAllAttributeValues($attribute->getAttributeCode(), $collection, $childAndParentIds);
             if (in_array($attribute->getDefaultFrontendLabel(), $titleFilters)) {
                 continue;
             }
@@ -433,5 +435,52 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
             return __('%1 - %2', $formattedFromPrice, $helper->currency($toPrice, true, false));
         }
+    }
+
+
+    /**
+     * Return all attribute values as array in form:
+     * array(
+     *   [entity_id_1] => array(
+     *          [store_id_1] => store_value_1,
+     *          [store_id_2] => store_value_2,
+     *          ...
+     *          [store_id_n] => store_value_n
+     *   ),
+     *   ...
+     * )
+     *
+     * @param string $attribute attribute code
+     * @param Magento\Catalog\Model\ResourceModel\Product\Collection $collection product collection
+     * @param array $childAndParentIds id of product to filter
+     * @return array
+     */
+    public function getAllAttributeValues($attribute, $collection, $childAndParentIds)
+    {
+        /** @var $select \Magento\Framework\DB\Select */
+        $select = clone $collection->getSelect();
+        $attribute = $collection->getEntity()->getAttribute($attribute);
+
+        $fieldMainTable = $collection->getConnection()->getAutoIncrementField($collection->getMainTable());
+        $fieldJoinTable = $attribute->getEntity()->getLinkField();
+        $select->reset()
+            ->from(
+                ['cpe' => $collection->getMainTable()],
+                ['entity_id']
+            )->join(
+                ['cpa' => $attribute->getBackend()->getTable()],
+                'cpe.' . $fieldMainTable . ' = cpa.' . $fieldJoinTable,
+                ['store_id', 'value']
+            )->where('attribute_id = ?', (int)$attribute->getId())
+            ->where('cpe.entity_id IN (?)', $childAndParentIds);
+
+        $data = $collection->getConnection()->fetchAll($select);
+        $res = [];
+
+        foreach ($data as $row) {
+            $res[$row['entity_id']][$row['store_id']] = $row['value'];
+        }
+
+        return $res;
     }
 }
