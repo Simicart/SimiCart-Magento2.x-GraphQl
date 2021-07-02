@@ -122,6 +122,7 @@ class ProductSearch
         */
         $collection = null;
         $helper = $this->simiProductHelper;
+        $noFilter = isset($args['simiNoFilter']) && $args['simiNoFilter'];
         $params = array(
             'filter' => array()
         );
@@ -187,9 +188,8 @@ class ProductSearch
         }
         //To remove the filtered attribute to get all available filters (including the filtered values)
         $helper->filteredAttributes = [];
-
         //get simi_filter options
-        if (!$is_details && ($simiProductFilters = $helper->getLayerNavigator($collection, $params))) {
+        if (!$is_details && !$noFilter && ($simiProductFilters = $helper->getLayerNavigator($collection, $params))) {
             $simiFilterOptions = array();
             if (isset($simiProductFilters['layer_filter'])) {
                 foreach ($simiProductFilters['layer_filter'] as $layer_filter) {

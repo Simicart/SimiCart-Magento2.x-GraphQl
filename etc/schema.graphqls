@@ -3,6 +3,7 @@ type Query {
         search: String @doc(description: "Performs a full-text search using the specified key words."),
         filter: ProductAttributeFilterInput @doc(description: "Identifies which product attributes to search for and return."),
         simiFilter: String @doc(description: "Simiconnector filter."),
+        simiNoFilter: Boolean = false @doc(description: "Ignore Filter Process for faster API."),
         pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once. This attribute is optional."),
         currentPage: Int = 1 @doc(description: "Specifies which page of results to return. The default value is 1."),
         sort: ProductAttributeSortInput @doc(description: "Specifies which attribute to sort on, and whether to return the results in ascending or descending order."),

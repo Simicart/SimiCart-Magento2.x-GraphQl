@@ -5,6 +5,10 @@
  */
 
 namespace Simi\SimiconnectorGraphQl\Helper;
+use Magento\Bundle\Model\ResourceModel\Selection as BundleSelection;
+use Magento\GroupedProduct\Model\ResourceModel\Product\Link as GroupedProductLink;
+use Magento\Framework\EntityManager\MetadataPool;
+use Magento\Catalog\Api\Data\ProductInterface;
 
 class Products extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -27,6 +31,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $stockHelper;
     public $categoryModelFactory;
     public $productModelFactory;
+    public $bundleSelection;
+    public $groupedProductLink;
+    public $metadataPool;
     public $currencyFactory;
 
     const XML_PATH_RANGE_STEP = 'catalog/layered_navigation/price_range_step';
@@ -47,6 +54,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\CatalogInventory\Helper\Stock $stockHelper,
         \Magento\Catalog\Model\Category $categoryModelFactory,
         \Magento\Catalog\Model\Product $productModelFactory,
+        BundleSelection $bundleSelection,
+        GroupedProductLink $groupedProductLink,
+        MetadataPool $metadataPool,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory
     )
     {
@@ -64,6 +74,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->stockHelper = $stockHelper;
         $this->categoryModelFactory = $categoryModelFactory;
         $this->productModelFactory = $productModelFactory;
+        $this->bundleSelection = $bundleSelection;
+        $this->groupedProductLink = $groupedProductLink;
+        $this->metadataPool = $metadataPool;
         $this->currencyFactory = $currencyFactory;
         parent::__construct($context);
     }
@@ -316,12 +329,13 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $childProductsIds = [];
         if ($arrayIDs && count($arrayIDs)) {
+            $resource = $collection->getResource();
+            //configurable products
             $childProducts = $this->productCollectionFactory->create()
-                ->addAttributeToSelect('*')
-                ->addAttributeToFilter('type_id', 'simple');
+                ->addAttributeToSelect('*');
             $select = $childProducts->getSelect();
             $select->joinLeft(
-                array('link_table' => $collection->getResource()->getTable('catalog_product_super_link')),
+                array('link_table' => $resource->getTable('catalog_product_super_link')),
                 'link_table.product_id = e.entity_id',
                 array('product_id', 'parent_id')
             );
@@ -330,13 +344,63 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             foreach ($childProducts->getAllIds() as $allProductId) {
                 $childProductsIds[$allProductId] = '1';
             }
+            //bundle products
+            $connection = $this->bundleSelection->getConnection();
+            $linkField = $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField();
+            $select = $connection->select()->from(
+                ['tbl_selection' => $this->bundleSelection->getMainTable()],
+                ['product_id', 'parent_product_id', 'option_id']
+            )->join(
+                ['e' => $resource->getTable('catalog_product_entity')],
+                'e.entity_id = tbl_selection.product_id AND e.required_options=0',
+                []
+            )->join(
+                ['parent' => $resource->getTable('catalog_product_entity')],
+                'tbl_selection.parent_product_id = parent.' . $linkField
+            )->join(
+                ['tbl_option' => $resource->getTable('catalog_product_bundle_option')],
+                'tbl_option.option_id = tbl_selection.option_id',
+                ['required']
+            )->where(
+                'parent.entity_id IN (' . implode(',', array_keys($arrayIDs)) . ')'
+            );
+            foreach ($connection->fetchAll($select) as $row) {
+                if (isset($row['product_id']))
+                    $childProductsIds[$row['product_id']] = '1';
+            }
+            //grouped products
+            $connection = $this->groupedProductLink->getConnection();
+            $bind = [':link_type_id' => GroupedProductLink::LINK_TYPE_GROUPED];
+            $select = $connection->select()->from(
+                ['l' => $this->groupedProductLink->getMainTable()],
+                ['linked_product_id']
+            )->join(
+                ['cpe' => $this->groupedProductLink->getTable('catalog_product_entity')],
+                sprintf(
+                    'cpe.%s = l.product_id',
+                    $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField()
+                )
+            )->where(
+                'cpe.entity_id IN (' . implode(',', array_keys($arrayIDs)) . ')'
+            )->where(
+                'link_type_id = :link_type_id'
+            );
+
+            $select->join(
+                ['e' => $this->groupedProductLink->getTable('catalog_product_entity')],
+                'e.entity_id = l.linked_product_id AND e.required_options = 0',
+                []
+            );
+            foreach ($connection->fetchAll($select, $bind) as $row) {
+                if (isset($row['linked_product_id']))
+                    $childProductsIds[$row['linked_product_id']] = '1';
+            }
         }
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         foreach ($attributeCollection as $attribute) {
-
             $attributeCode = $attribute->getAttributeCode();
             $attributeOptions = [];
-            $attributeValues = $this->getAllAttributeValues($attribute->getAttributeCode(), $collection, $childAndParentIds);
+            $attributeValues = $this->getAllAttributeValues($attributeCode, $collection, $childAndParentIds);
             if (in_array($attribute->getDefaultFrontendLabel(), $titleFilters)) {
                 continue;
             }
