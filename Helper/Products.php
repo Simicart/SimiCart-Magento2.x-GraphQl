@@ -5,8 +5,11 @@
  */
 
 namespace Simi\SimiconnectorGraphQl\Helper;
+
 use Magento\Bundle\Model\ResourceModel\Selection as BundleSelection;
 use Magento\GroupedProduct\Model\ResourceModel\Product\Link as GroupedProductLink;
+use \Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
+use \Magento\Bundle\Model\Product\Type as BundleType;
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Catalog\Api\Data\ProductInterface;
 
@@ -34,6 +37,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $bundleSelection;
     public $groupedProductLink;
     public $metadataPool;
+    public $bundleType;
+    public $groupType;
     public $currencyFactory;
 
     const XML_PATH_RANGE_STEP = 'catalog/layered_navigation/price_range_step';
@@ -57,9 +62,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         BundleSelection $bundleSelection,
         GroupedProductLink $groupedProductLink,
         MetadataPool $metadataPool,
+        GroupedType $groupType,
+        BundleType $bundleType,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory
-    )
-    {
+    ) {
 
         $this->simiObjectManager = $simiObjectManager;
         $this->scopeConfig = $scopeConfigInterface;
@@ -77,6 +83,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->bundleSelection = $bundleSelection;
         $this->groupedProductLink = $groupedProductLink;
         $this->metadataPool = $metadataPool;
+        $this->groupType = $groupType;
+        $this->bundleType = $bundleType;
         $this->currencyFactory = $currencyFactory;
         parent::__construct($context);
     }
@@ -124,6 +132,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function filterCollectionByAttribute($collection, $params, &$cat_filtered)
     {
+        $pIdsToFilter = false;
         foreach ($params['filter']['layer'] as $key => $value) {
             if ($key == 'price') {
                 $currencyCodeFrom = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
@@ -131,12 +140,12 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $rate = $this->currencyFactory->create()->load($currencyCodeTo)->getAnyRate($currencyCodeFrom);
 
                 $value = explode('-', $value);
-	            if ( isset( $value[0] ) && isset( $value[1] ) ) {
-		            $priceFrom = $value[0] / $rate;
-		            $priceTo   = $value[1] / $rate;
-		            $collection->getSelect()->where( "price_index.final_price > " . $priceFrom )
-		                       ->where( "price_index.final_price < " . $priceTo );
-	            }
+                if (isset($value[0]) && isset($value[1])) {
+                    $priceFrom = $value[0] / $rate;
+                    $priceTo   = $value[1] / $rate;
+                    $collection->getSelect()->where("price_index.final_price > " . $priceFrom)
+                        ->where("price_index.final_price < " . $priceTo);
+                }
             } else {
                 if ($key == 'category_id') {
                     $cat_filtered = true;
@@ -149,7 +158,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                     $this->filteredAttributes[$key] = $value;
                     $collection->addCategoriesFilter(['in' => $value]);
-                } elseif ($key == 'size' || $key == 'color') {
+                } else {
+                    if (!$pIdsToFilter)
+                        $pIdsToFilter = [];
                     $this->filteredAttributes[$key] = $value;
                     # code...
                     $productIds = [];
@@ -174,28 +185,37 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                             array('product_id', 'parent_id')
                         );
 
-                    $collectionChid->getSelect()->group('link_table.parent_id');
+                    foreach ($collectionChid as $product) {
+                        // check for group products
+                        if (
+                            $this->groupType->getParentIdsByChild($product->getId())
+                            && is_array($this->groupType->getParentIdsByChild($product->getId()))
+                            && count($this->groupType->getParentIdsByChild($product->getId()))
+                        ) {
+                            $productIds = array_merge($productIds, $this->groupType->getParentIdsByChild($product->getId()));
+                        }
+                        // check for bundle products
+                        if (
+                            $this->bundleType->getParentIdsByChild($product->getId())
+                            && is_array($this->bundleType->getParentIdsByChild($product->getId()))
+                            && count($this->bundleType->getParentIdsByChild($product->getId()))
+                        ) {
+                            $productIds = array_merge($productIds, $this->bundleType->getParentIdsByChild($product->getId()));
+                        }
+                        $productIds[] = $product->getParentId() ? $product->getParentId() : $product->getId();
+                    }
 
                     foreach ($collectionChid as $product) {
                         $productIds[] = $product->getParentId();
                     }
-
-                    $collection->addAttributeToFilter('entity_id', array('in' => $productIds));
-                } else {
-                    $this->filteredAttributes[$key] = $value;
-                    if (is_array($value)) {
-                        $insetArray = array();
-                        foreach ($value as $child_value) {
-                            $insetArray[] = array('finset' => array($child_value));
-                        }
-                        $collection->addAttributeToFilter($key, $insetArray);
-                    } else
-                        $collection->addAttributeToFilter($key, ['finset' => $value]);
+                    $pIdsToFilter = array_merge($pIdsToFilter, $productIds);
                 }
             }
+            if ($pIdsToFilter)
+                $collection->addAttributeToFilter('entity_id', array('in' => $pIdsToFilter));
         }
     }
-    
+
     public function getLayerNavigator($collection = null, $params = null)
     {
         if (!$collection) {
@@ -267,7 +287,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $selectedFilters = [];
         foreach ($this->filteredAttributes as $key => $value) {
             if (($key == 'category_id') && is_array($value) &&
-                (count($value) >= 2)) {
+                (count($value) >= 2)
+            ) {
                 $value = $value[1];
                 $category = $this->loadCategoryWithId($value);
                 $selectedFilters[] = [
@@ -279,7 +300,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 continue;
             }
             if (($key == 'price') && is_array($value) &&
-                (count($value) >= 2)) {
+                (count($value) >= 2)
+            ) {
                 $selectedFilters[] = [
                     'value' => implode('-', $value),
                     'label' => $this->_renderRangeLabel($value[0], $value[1]),
@@ -405,11 +427,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 continue;
             }
             foreach ($attributeValues as $productId => $optionIds) {
-                if (isset($optionIds[0]) &&
+                if (
+                    isset($optionIds[0]) &&
                     (
                         (isset($arrayIDs[$productId]) && ($arrayIDs[$productId] != null)) ||
-                        (isset($childProductsIds[$productId]) && ($childProductsIds[$productId] != null))
-                    )
+                        (isset($childProductsIds[$productId]) && ($childProductsIds[$productId] != null)))
                 ) {
                     $optionIds = explode(',', $optionIds[0]);
                     foreach ($optionIds as $optionId) {
@@ -425,8 +447,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $options = $attribute->getSource()->getAllOptions();
             $filters = [];
             foreach ($options as $option) {
-                if (isset($option['value']) && isset($attributeOptions[$option['value']])
-                    && $attributeOptions[$option['value']]) {
+                if (
+                    isset($option['value']) && isset($attributeOptions[$option['value']])
+                    && $attributeOptions[$option['value']]
+                ) {
                     $option['count'] = $attributeOptions[$option['value']];
                     $filters[] = $option;
                 }
