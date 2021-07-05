@@ -159,8 +159,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->filteredAttributes[$key] = $value;
                     $collection->addCategoriesFilter(['in' => $value]);
                 } else {
-                    if (!$pIdsToFilter)
-                        $pIdsToFilter = [];
                     $this->filteredAttributes[$key] = $value;
                     # code...
                     $productIds = [];
@@ -168,8 +166,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
                     $collectionChid->addAttributeToSelect('*')
                         ->addStoreFilter()
-                        ->addAttributeToFilter('status', 1)
-                        ->addFinalPrice();
+                        ->addAttributeToFilter('status', 1);
+                    if ($pIdsToFilter) {
+                        $collectionChid->addFieldToFilter('entity_id', ['in' => $pIdsToFilter]);
+                    }
+                    $collectionChid->addFinalPrice();
                     if (is_array($value)) {
                         $insetArray = array();
                         foreach ($value as $child_value) {
@@ -208,6 +209,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     foreach ($collectionChid as $product) {
                         $productIds[] = $product->getParentId();
                     }
+                    if (!$pIdsToFilter)
+                        $pIdsToFilter = [];
                     $pIdsToFilter = array_merge($pIdsToFilter, $productIds);
                 }
             }
