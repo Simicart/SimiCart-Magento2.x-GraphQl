@@ -18,4 +18,7 @@
         <plugin name="simiconnectorgrapqhl_buy_request_customization_options_data_provider_plugin"
                 type="Simi\SimiconnectorGraphQl\Plugin\CustomizableOptionsDataProvider"/>
     </type>
+    <!-- uncomment this and run `bin/magento catalog:images:resize --async` while facing issue with listing/grid product image
+        <preference for="Magento\CatalogGraphQl\Model\Resolver\Product\MediaGallery\Url" type="Simi\SimiconnectorGraphQl\Override\MediaGallery\Url" />
+    -->
 </config>
