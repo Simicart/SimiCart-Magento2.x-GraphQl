@@ -40,6 +40,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $bundleType;
     public $groupType;
     public $currencyFactory;
+    public $pIdsFiltedByKey = [];
 
     const XML_PATH_RANGE_STEP = 'catalog/layered_navigation/price_range_step';
     const MIN_RANGE_POWER = 10;
@@ -139,6 +140,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $arrayIDs[$allProductId] = '1';
         }
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
+        $this->beforeApplyFilterParentIds = $allProductIds;
         $this->beforeApplyFilterArrayIds = $arrayIDs;
         $this->beforeApplyFilterChildProductsIds = $childProductsIds;
         $this->beforeApplyFilterChildAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
@@ -148,8 +150,12 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
         $this->beforeApplyFilterChildAndParentIds = $childAndParentCollection->getAllIds();
         //end
-        $pIdsToFilter = false;
+        $pIdsToFilter = $allProductIds;
         foreach ($params['filter']['layer'] as $key => $value) {
+            $newCollection = $this->productCollectionFactory->create()
+                ->addAttributeToSelect('*')
+                ->addStoreFilter()
+                ->addAttributeToFilter('status', 1);
             if ($key == 'price') {
                 $currencyCodeFrom = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
                 $currencyCodeTo = $this->storeManager->getStore()->getBaseCurrency()->getCode();
@@ -173,7 +179,18 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                         }
                     }
                     $this->filteredAttributes[$key] = $value;
-                    $collection->addCategoriesFilter(['in' => $value]);
+                    $newCollection->addCategoriesFilter(['in' => $value]);
+                } elseif ($key !== 'color' && $key !== 'size') {
+                    //no need to filter by child products if not size or color (to optimize)
+                    $this->filteredAttributes[$key] = $value;
+                    if (is_array($value)) {
+                        $insetArray = array();
+                        foreach ($value as $child_value) {
+                            $insetArray[] = array('finset' => array($child_value));
+                        }
+                        $newCollection->addAttributeToFilter($key, $insetArray);
+                    } else
+                        $newCollection->addAttributeToFilter($key, ['finset' => $value]);
                 } else {
                     $this->filteredAttributes[$key] = $value;
                     # code...
@@ -235,14 +252,14 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                         } else
                             $collection->addAttributeToFilter($key, ['finset' => $value]);
                     }
-                    if (!$pIdsToFilter)
-                        $pIdsToFilter = [];
-                    $pIdsToFilter = array_merge($pIdsToFilter, $productIds);
+                    $newCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
                 }
+                $this->pIdsFiltedByKey[$key] = $newCollection->getAllIds();
             }
-            if ($pIdsToFilter) {
-                $collection->addAttributeToFilter('entity_id', array('in' => $pIdsToFilter));
+            foreach ($this->pIdsFiltedByKey as $pIdsFiltedByKey) {
+                $pIdsToFilter = array_intersect($pIdsToFilter, $pIdsFiltedByKey);
             }
+            $collection->addAttributeToFilter('entity_id', array('in' => $pIdsToFilter));
         }
     }
 
@@ -262,7 +279,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             //->addFieldToFilter('used_in_product_listing', 1) //cody comment out jun152019
             //->addFieldToFilter('is_visible_on_front', 1) //cody comment out jun152019
         ;
-        $attributeCollection->addFieldToFilter('attribute_code', ['nin' => ['price']]);
+        //$attributeCollection->addFieldToFilter('attribute_code', ['nin' => ['price']]);
         if ($this->is_search)
             $attributeCollection->addFieldToFilter('is_filterable_in_search', 1);
 
@@ -275,6 +292,20 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
         $titleFilters = [];
         $this->_filterByAtribute($collection, $attributeCollection, $titleFilters, $layerFilters, $arrayIDs);
+
+        /**
+         * Uncomment the lines below to bring back the price filter
+         * */
+        /**
+        if (!(!empty($params['filter']['layer']) && is_array($params['filter']['layer']) && array_key_exists('price', $params['filter']['layer']))) {
+            if ($this->afterFilterChildAndParentIds) {
+                $parentAndChildCollection = $this->productCollectionFactory->create()->addPriceData()->addFinalPrice()
+                    ->addFieldToFilter('entity_id', array('in' => $this->afterFilterChildAndParentIds))
+                    ->addAttributeToFilter('status', 1);
+                $this->_filterByPriceRange($layerFilters, $parentAndChildCollection, $params);
+            }
+        }
+        */
 
         // category
         if ($this->category) {
@@ -389,16 +420,23 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
         $childAndParentIds = $childAndParentCollection->getAllIds();
         $parentIds = array_keys($arrayIDs);
-        $beforeApplyFilterParentIds = array_keys($this->beforeApplyFilterArrayIds);
+        $this->afterFilterChildAndParentIds = $childAndParentIds;
         foreach ($attributeCollection as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $attributeOptions = [];
             //get value from child is going to cause wrong count value
-            $toGetValueFromChild = ($attributeCode === 'color' || $attributeCode === 'size');
+            $toGetValueFromChild = ($attributeCode == 'color' || $attributeCode == 'size');
+            $idArrayToFilter = $toGetValueFromChild ? $childAndParentIds : $parentIds;
             $filteredAbove = isset($this->filteredAttributes[$attributeCode]);
-            $idArrayToFilter = $filteredAbove ?
-                ($toGetValueFromChild ? $this->beforeApplyFilterChildAndParentIds : $beforeApplyFilterParentIds)
-                : ($toGetValueFromChild ? $childAndParentIds : $parentIds);
+            if ($filteredAbove) {
+                $idArrayToFilter = $toGetValueFromChild ? $this->beforeApplyFilterChildAndParentIds : $this->beforeApplyFilterParentIds;
+                foreach ($this->pIdsFiltedByKey as $key => $pIdsFiltedByKey) {
+                    if ($key !== $attributeCode) {
+                        $idArrayToFilter = array_intersect($idArrayToFilter, $pIdsFiltedByKey);
+                    }
+                }
+            }
+
             $attributeValues = $this->getAllAttributeValues($attributeCode, $collection, $idArrayToFilter);
             if (in_array($attribute->getDefaultFrontendLabel(), $titleFilters)) {
                 continue;
@@ -445,6 +483,54 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
+    public function _filterByPriceRange(&$layerFilters, $collection, $params)
+    {
+        $priceRanges = $this->_getPriceRanges($collection);
+        $filters     = [];
+        $totalCount  = 0;
+        $maxIndex    = 0;
+        if ($this->simiObjectManager->get('Simi\Simiconnector\Helper\Data')->countArray($priceRanges['counts']) > 0) {
+            $maxIndex = max(array_keys($priceRanges['counts']));
+        }
+        $countArr = $priceRanges['counts'];
+        ksort($countArr);
+        foreach ($countArr as $index => $count) {
+            if ($index === '' || $index == 1) {
+                $index = 1;
+                $totalCount += $count;
+            } else {
+                $totalCount = $count;
+            }
+            if (isset($params['layer']['price'])) {
+                $prices    = explode('-', $params['layer']['price']);
+                $fromPrice = $prices[0];
+                $toPrice   = $prices[1];
+            } else {
+                $fromPrice = $priceRanges['range'] * ($index - 1);
+                $toPrice   = $priceRanges['range'] * ($index);
+            }
+
+            if ($index >= 1) {
+                $filters[$index] = [
+                    'value' => $fromPrice . '-' . $toPrice,
+                    'label' => $this->_renderRangeLabel($fromPrice, $toPrice),
+                    'count' => (int) ($totalCount)
+                ];
+            }
+        }
+        if ($this->simiObjectManager
+            ->get('Simi\Simiconnector\Helper\Data')
+            ->countArray($filters) >= 1
+        ) {
+            $priceAttributes = $this->simiObjectManager->get('\Magento\Eav\Model\Config')->getAttribute('catalog_product', 'price');
+            $layerFilters[] = [
+                'attribute' => 'price',
+                'title'     => __('Price'),
+                'filter'    => array_values($filters),
+                'position'  => $priceAttributes->getPosition()
+            ];
+        }
+    }
     /*
      * Get price range filter
      *
