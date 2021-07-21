@@ -145,6 +145,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->beforeApplyFilterChildProductsIds = $childProductsIds;
         $this->beforeApplyFilterChildAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->productCollectionFactory->create()
+            ->addAttributeToSelect('*')
+            ->addStoreFilter()
             ->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterChildAndParentIds])
             ->addFieldToFilter('status', 1);
         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
@@ -152,10 +154,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         //end
         $pIdsToFilter = $allProductIds;
         foreach ($params['filter']['layer'] as $key => $value) {
-            $newCollection = $this->productCollectionFactory->create()
-                ->addAttributeToSelect('*')
-                ->addStoreFilter()
-                ->addAttributeToFilter('status', 1);
+            $newCollection = $childAndParentCollection;
             if ($key == 'price') {
                 $currencyCodeFrom = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
                 $currencyCodeTo = $this->storeManager->getStore()->getBaseCurrency()->getCode();
@@ -196,13 +195,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     # code...
                     $productIds = [];
                     $collectionChid = $this->productCollectionFactory->create();
-
                     $collectionChid->addAttributeToSelect('*')
                         ->addStoreFilter()
                         ->addAttributeToFilter('status', 1);
-                    if ($pIdsToFilter) {
-                        $collectionChid->addFieldToFilter('entity_id', ['in' => $pIdsToFilter]);
-                    }
+                    $collectionChid->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterChildAndParentIds]);
                     $collectionChid->addFinalPrice();
                     if (is_array($value)) {
                         $insetArray = array();
@@ -219,6 +215,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                             array('product_id', 'parent_id')
                         );
                     try {
+                        /**
+                         * uncomment closure below to filter by bundle child, will make filtering slower
+                         */
+                        /**
                         foreach ($collectionChid as $product) {
                             // check for group products
                             if (
@@ -237,10 +237,12 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                                 $productIds = array_merge($productIds, $this->bundleType->getParentIdsByChild($product->getId()));
                             }
                             $productIds[] = $product->getParentId() ? $product->getParentId() : $product->getId();
-                        }
+                        } 
+                         */
                         foreach ($collectionChid as $product) {
                             $productIds[] = $product->getParentId();
                         }
+                        $newCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
                     } catch (\Exception $e) {
                         //when getting collection faced issue `product id already exist` - fallback to old attribute filter
                         if (is_array($value)) {
@@ -248,19 +250,18 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                             foreach ($value as $child_value) {
                                 $insetArray[] = array('finset' => array($child_value));
                             }
-                            $collection->addAttributeToFilter($key, $insetArray);
+                            $newCollection->addAttributeToFilter($key, $insetArray);
                         } else
-                            $collection->addAttributeToFilter($key, ['finset' => $value]);
+                            $newCollection->addAttributeToFilter($key, ['finset' => $value]);
                     }
-                    $newCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
                 }
                 $this->pIdsFiltedByKey[$key] = $newCollection->getAllIds();
             }
-            foreach ($this->pIdsFiltedByKey as $pIdsFiltedByKey) {
-                $pIdsToFilter = array_intersect($pIdsToFilter, $pIdsFiltedByKey);
-            }
-            $collection->addAttributeToFilter('entity_id', array('in' => $pIdsToFilter));
         }
+        foreach ($this->pIdsFiltedByKey as $pIdsFiltedByKey) {
+            $pIdsToFilter = array_intersect($pIdsToFilter, $pIdsFiltedByKey);
+        }
+        $collection->addAttributeToFilter('entity_id', array('in' => $pIdsToFilter));
     }
 
     public function getLayerNavigator($collection = null, $params = null)
@@ -518,7 +519,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 ];
             }
         }
-        if ($this->simiObjectManager
+        if (
+            $this->simiObjectManager
             ->get('Simi\Simiconnector\Helper\Data')
             ->countArray($filters) >= 1
         ) {
