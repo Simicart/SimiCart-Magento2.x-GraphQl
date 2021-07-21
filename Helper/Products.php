@@ -154,7 +154,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         //end
         $pIdsToFilter = $allProductIds;
         foreach ($params['filter']['layer'] as $key => $value) {
-            $newCollection = $childAndParentCollection;
+            $newCollection = $this->productCollectionFactory->create()
+                ->addAttributeToSelect('*')
+                ->addStoreFilter()
+                ->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterChildAndParentIds])
+                ->addFieldToFilter('status', 1);
             if ($key == 'price') {
                 $currencyCodeFrom = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
                 $currencyCodeTo = $this->storeManager->getStore()->getBaseCurrency()->getCode();
