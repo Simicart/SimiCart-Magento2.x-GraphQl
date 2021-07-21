@@ -185,9 +185,12 @@ class ProductSearch
             }
             $params['filter']['layer'] = $simiFilter;
             $helper->filterCollectionByAttribute($collection, $params, $cat_filtered);
+        } else {
+            $cat_filtered = false;
+            $params['filter']['layer'] = [];
+            $helper->filterCollectionByAttribute($collection, $params, $cat_filtered);
         }
-        //To remove the filtered attribute to get all available filters (including the filtered values)
-        $helper->filteredAttributes = [];
+
         //get simi_filter options
         if (!$is_details && !$noFilter && ($simiProductFilters = $helper->getLayerNavigator($collection, $params))) {
             $simiFilterOptions = array();
@@ -222,7 +225,6 @@ class ProductSearch
         if (in_array('options', $attributes)) {
             $collection->addOptionsToResult();
         }
-
         //simi add pagination + sort
         if (isset($args['currentPage']) && isset($args['pageSize'])) {
             $collection->setPageSize($args['pageSize']);
