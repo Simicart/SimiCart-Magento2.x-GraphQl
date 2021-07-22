@@ -11,7 +11,6 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Sales\Model\ResourceModel\Report\Bestsellers\CollectionFactory as BestSellersCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
-
 class SimiCMSpage implements ResolverInterface
 {
     protected $storeManager;
@@ -27,13 +26,11 @@ class SimiCMSpage implements ResolverInterface
         \Simi\Simiconnector\Model\ResourceModel\Visibility\CollectionFactory $collectionVisibility,
         \Simi\Simiconnector\Helper\Data $helper,
         \Simi\Simiconnector\Model\ResourceModel\Cms\CollectionFactory $collectionCMS
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->collectionVisibility = $collectionVisibility;
         $this->imageHelper = $helper;
         $this->collectionCMS = $collectionCMS;
-
     }
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
@@ -90,5 +87,4 @@ class SimiCMSpage implements ResolverInterface
             return strnatcmp($a[$key], $b[$key]);
         };
     }
-
 }

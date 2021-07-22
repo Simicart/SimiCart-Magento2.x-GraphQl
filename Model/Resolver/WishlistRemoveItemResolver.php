@@ -44,8 +44,7 @@ class WishlistRemoveItemResolver implements ResolverInterface
         WishlistResourceModel $wishlistResource,
         WishlistFactory $wishlistFactory,
         Item $wishlistItem
-    )
-    {
+    ) {
         $this->wishlistResource = $wishlistResource;
         $this->wishlistFactory = $wishlistFactory;
         $this->wishlistItem = $wishlistItem;

@@ -28,23 +28,23 @@ class SimiTotals implements ResolverInterface
         }
         $quote = $value['model'];
         $currency = $quote->getData('quote_currency_code');
-        return array(
-            array(
+        return [
+            [
                 'code' => 'grand_total',
                 'value' => $quote->getGrandTotal(),
                 'currency' => $currency,
-            ),
-            array(
+            ],
+            [
                 'code' => 'subtotal',
                 'value' => $quote->getSubtotal(),
                 'currency' => $currency,
-            ),
-            array(
+            ],
+            [
                 'code' => 'subtotal_with_discount',
                 'value' => $quote->getSubtotalWithDiscount(),
                 'currency' => $currency,
-            ),
-        );
+            ],
+        ];
         return null;
     }
 }

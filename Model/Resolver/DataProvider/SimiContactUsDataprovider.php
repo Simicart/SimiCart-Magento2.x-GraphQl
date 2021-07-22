@@ -23,8 +23,7 @@ class SimiContactUsDataprovider
         MailInterface $mail,
         DataPersistorInterface $dataPersistor,
         \Magento\Framework\Data\Form\FormKey $formKey
-    )
-    {
+    ) {
         $this->mail = $mail;
         $this->dataPersistor = $dataPersistor;
         $this->formKey = $formKey;

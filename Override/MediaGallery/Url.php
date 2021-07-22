@@ -92,7 +92,7 @@ class Url implements ResolverInterface
         $image = $this->productImageFactory->create();
         $image->setDestinationSubdir($imageType);
         if ($imageType === 'small_image') {
-            /* 
+            /*
             find the width and height from template xml configuration file, like
             app/design/frontend/Simi/base_child/etc/view.xml
             <image id="category_page_grid" type="small_image">

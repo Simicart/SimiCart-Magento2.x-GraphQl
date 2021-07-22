@@ -16,8 +16,7 @@ class GetCartForUser
         StoreManagerInterface $storeManager,
         MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
         CartRepositoryInterface $cartRepository
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId;
         $this->cartRepository = $cartRepository;
@@ -38,8 +37,9 @@ class GetCartForUser
                 $cartChanged = true;
                 $cart->setData('quote_currency_code', $currencyCode);
             }
-            if ($cartChanged)
+            if ($cartChanged) {
                 $cart->save();
+            }
         } catch (\Exception $e) {
 
         }

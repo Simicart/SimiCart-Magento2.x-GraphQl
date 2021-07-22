@@ -21,7 +21,6 @@ use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
 use Magento\QuoteGraphQl\Model\Resolver\CustomerCart;
 
-
 /**
  * Fetches the Wishlist data according to the GraphQL schema
  */
@@ -75,8 +74,7 @@ class WishlistToCartResolver implements ResolverInterface
         GetCartForUser $getCartForUser,
         Cart $cart,
         CustomerCart $customerCart
-    )
-    {
+    ) {
         $this->wishlistResource = $wishlistResource;
         $this->wishlistFactory = $wishlistFactory;
         $this->wishlistItem = $wishlistItem;

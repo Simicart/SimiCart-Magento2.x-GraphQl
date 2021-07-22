@@ -15,8 +15,7 @@ class AccountCreatePasswordDispatch implements ObserverInterface
         \Magento\Framework\UrlInterface $url,
         \Magento\Framework\ObjectManagerInterface $simiObjectManager,
         \Magento\Framework\App\Response\Http $redirect
-    )
-    {
+    ) {
         $this->simiObjectManager = $simiObjectManager;
         $this->_url = $url;
         $this->_redirect = $redirect;
@@ -35,7 +34,7 @@ class AccountCreatePasswordDispatch implements ObserverInterface
             $targetUrl = $pwa_studio_url . $pathUri;
             header('Location: ' . $targetUrl);
             exit;
-            //			$this->_redirect->setRedirect($targetUrl)->sendResponse();;
+            //            $this->_redirect->setRedirect($targetUrl)->sendResponse();;
         }
     }
 }

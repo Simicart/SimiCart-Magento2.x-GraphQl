@@ -45,8 +45,7 @@ class ItemsResolver implements ResolverInterface
     public function __construct(
         OrderFactory $orderFactory,
         Image $imageHelper
-    )
-    {
+    ) {
         $this->orderFactory = $orderFactory;
         $this->imageHelper = $imageHelper;
     }

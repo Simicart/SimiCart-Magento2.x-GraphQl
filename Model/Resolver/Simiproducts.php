@@ -79,8 +79,7 @@ class Simiproducts implements ResolverInterface
         \Simi\Simiconnector\Helper\Review $simiReviewHelper,
         \Simi\Simiconnector\Helper\Price $simiPriceHelper,
         \Magento\Framework\View\LayoutInterface $simiLayout
-    )
-    {
+    ) {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->searchQuery = $searchQuery;
         $this->filterQuery = $filterQuery;
@@ -107,8 +106,7 @@ class Simiproducts implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         if ($args['currentPage'] < 1) {
             throw new GraphQlInputException(__('currentPage value must be greater than 0.'));
         }
@@ -158,10 +156,10 @@ class Simiproducts implements ResolverInterface
                         unset($attributes['description']);*/
 
                     $this->productExtraData = [] /*array(
-					    'attribute_values' => $attributes,
-					    'app_reviews' => $this->simiReviewHelper
-						    ->getProductReviews($productModel->getId())
-				    )*/
+                        'attribute_values' => $attributes,
+                        'app_reviews' => $this->simiReviewHelper
+                            ->getProductReviews($productModel->getId())
+                    )*/
                     ;
                     $this->currentProductModel = $productModel;
                     $this->eventManager->dispatch(
@@ -186,12 +184,12 @@ class Simiproducts implements ResolverInterface
 
                     /*$tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);*/
 
-                    $this->extraFields = array(
+                    $this->extraFields = [
                         /*'attribute_values' => $productModel->toArray(),
                         'app_reviews' => $app_reviews,*/
                         'additional' => $_additional,
                         /*'app_tier_prices' => $tierPrice,*/
-                    );
+                    ];
                     $this->currentProductModel = $productModel;
                     $this->eventManager->dispatch(
                         'simi_simiconnector_graphql_product_detail_extra_field_after',
@@ -213,7 +211,7 @@ class Simiproducts implements ResolverInterface
             ],
             'search_result' => $searchResult,
             'layer_type' => isset($args['search']) ? Resolver::CATALOG_LAYER_SEARCH : Resolver::CATALOG_LAYER_CATEGORY,
-            'simi_filters' => $simiProductFilters ? json_decode($simiProductFilters) : array(),
+            'simi_filters' => $simiProductFilters ? json_decode($simiProductFilters) : [],
             'minPrice' => $registry->registry('simi_min_price'),
             'maxPrice' => $registry->registry('simi_max_price')
         ];

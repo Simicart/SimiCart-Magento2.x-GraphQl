@@ -64,8 +64,7 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
         EmailValidator $emailValidator = null,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         ScopeConfigInterface $scopeConfig
-    )
-    {
+    ) {
         $this->_objectManager = $objectManager;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->emailValidator = $emailValidator ?: ObjectManager::getInstance()->get(EmailValidator::class);
@@ -93,8 +92,7 @@ class Subscribe implements \Magento\Framework\GraphQl\Query\ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         try {
             $email = $args['email'];
             $this->validateEmailFormat($email);

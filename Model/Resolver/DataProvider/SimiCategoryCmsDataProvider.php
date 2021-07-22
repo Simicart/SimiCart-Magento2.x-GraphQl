@@ -29,8 +29,7 @@ class SimiCategoryCmsDataProvider extends DataProviderInterface
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         \Magento\Cms\Model\BlockFactory $blockFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager
-    )
-    {
+    ) {
         $this->simiObjectManager = $simiObjectManager;
         $this->simiLayout = $simiLayout;
         $this->categoryFactory = $categoryFactory;

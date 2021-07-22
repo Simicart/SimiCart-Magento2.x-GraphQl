@@ -41,8 +41,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\ObjectManagerInterface $simiObjectManager
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->appScopeConfigInterface = $appScopeConfigInterface;
         $this->countryModelFactory = $countryModelFactory;
@@ -82,7 +81,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
             }
         }
 
-        $configArray = array(
+        $configArray = [
             'base' => [
                 'country_code' => $country->getId(),
                 'country_name' => $country->getName(),
@@ -281,7 +280,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                 'google_analytics_account' => $this->getStoreConfig('google/analytics/account'),
             ],
             'rating_form' => $this->getFormReviewCriterias()
-        );
+        ];
 
 
         if ($this->serializer) {
@@ -334,14 +333,14 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         $this->eventManager
             ->dispatch('simiconnectorgrapqhl_get_storeview_info_after', ['object' => $this]);
 
-        return array(
+        return [
             'store_id' => (int)$storeManager->getStore()->getId(),
             'currency' => $storeManager->getStore()->getCurrentCurrencyCode(),
             'root_category_id' => (int)$storeManager->getStore()->getRootCategoryId(),
             'pwa_studio_client_ver_number' => $this->appScopeConfigInterface
                 ->getValue('simiconnector/general/pwa_studio_client_ver_number'),
             'config' => $this->configArray,
-        );
+        ];
     }
 
     public function getCurrencyPosition()
@@ -386,8 +385,11 @@ class Simistoreconfigdataprovider extends DataProviderInterface
     private function getStoreConfig($path)
     {
         return $this->appScopeConfigInterface
-            ->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                $this->storeManager->getStore()->getCode());
+            ->getValue(
+                $path,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $this->storeManager->getStore()->getCode()
+            );
     }
 
 

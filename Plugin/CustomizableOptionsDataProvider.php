@@ -13,8 +13,7 @@ class CustomizableOptionsDataProvider
 
     public function __construct(
         ArrayManager $arrayManager
-    )
-    {
+    ) {
         $this->arrayManager = $arrayManager;
     }
 
@@ -68,5 +67,4 @@ class CustomizableOptionsDataProvider
 
         return $value;
     }
-
 }

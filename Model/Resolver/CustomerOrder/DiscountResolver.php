@@ -28,8 +28,7 @@ class DiscountResolver implements ResolverInterface
      */
     public function __construct(
         OrderFactory $orderFactory
-    )
-    {
+    ) {
         $this->orderFactory = $orderFactory;
     }
 

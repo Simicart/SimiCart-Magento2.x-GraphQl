@@ -19,8 +19,7 @@ class Simigroupdataprovider extends DataProviderInterface
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Store\Model\ResourceModel\Group\CollectionFactory $groupCollectionFactory,
         \Magento\Store\Model\ResourceModel\Store\CollectionFactory $storeCollectionFactory
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->groupCollectionFactory = $groupCollectionFactory;
         $this->storeCollectionFactory = $storeCollectionFactory;

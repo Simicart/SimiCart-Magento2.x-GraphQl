@@ -21,8 +21,7 @@ class Simigroupresolver implements ResolverInterface
      */
     public function __construct(
         Simigroupdataprovider $groupDataProvider
-    )
-    {
+    ) {
         $this->groupDataProvider = $groupDataProvider;
     }
 
@@ -35,8 +34,7 @@ class Simigroupresolver implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         return $this->groupDataProvider->getSimiGroupData($args);
     }
 }

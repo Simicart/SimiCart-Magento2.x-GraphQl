@@ -23,8 +23,7 @@ class SimiUserIsAuthed implements ResolverInterface
      */
     public function __construct(
         GetCartForUser $getCartForUser
-    )
-    {
+    ) {
         $this->getCartForUser = $getCartForUser;
     }
 
@@ -34,8 +33,7 @@ class SimiUserIsAuthed implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         $tokenValid = false;
         $cartEditable = false;
 
@@ -49,7 +47,7 @@ class SimiUserIsAuthed implements ResolverInterface
                     if ($quote && $quote->getId()) {
                         $cartEditable = true;
                     }
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
 
                 }
             }

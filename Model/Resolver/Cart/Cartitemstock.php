@@ -20,8 +20,7 @@ class Cartitemstock implements ResolverInterface
      */
     public function __construct(
         StockStateInterface $stockState
-    )
-    {
+    ) {
         $this->stockState = $stockState;
     }
 
@@ -31,8 +30,7 @@ class Cartitemstock implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         if (!isset($value['model'])) {
             return null;
         }
@@ -51,8 +49,9 @@ class Cartitemstock implements ResolverInterface
             );
             $stockMessage = $stockMessage->getData();
             if ($stockMessage['has_error']) {
-                if ($stockMessage['message'])
+                if ($stockMessage['message']) {
                     $stockErrorMessage = $stockMessage['message'];
+                }
                 $stockResult = false;
             }
         } catch (\Exception $e) {

@@ -18,8 +18,7 @@ abstract class DataProviderInterface
         \Magento\Store\Api\StoreCookieManagerInterface $storeCookieManager,
         \Magento\Framework\App\ResourceConnection $resource,
         \Magento\Framework\Event\ManagerInterface $eventManager
-    )
-    {
+    ) {
         $this->simiObjectManager = $simiObjectManager;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;

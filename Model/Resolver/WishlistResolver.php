@@ -44,8 +44,7 @@ class WishlistResolver implements ResolverInterface
         WishlistResourceModel $wishlistResource,
         WishlistFactory $wishlistFactory,
         ProductRepositoryInterface $productRepository
-    )
-    {
+    ) {
         $this->wishlistResource = $wishlistResource;
         $this->wishlistFactory = $wishlistFactory;
         $this->productRepository = $productRepository;
@@ -60,8 +59,7 @@ class WishlistResolver implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         $customerId = $context->getUserId();
 
         /* Guest checking */

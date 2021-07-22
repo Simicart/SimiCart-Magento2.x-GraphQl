@@ -77,8 +77,7 @@ class ProductSearch
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Registry $registry
-    )
-    {
+    ) {
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->collectionPreProcessor = $collectionPreProcessor;
@@ -105,8 +104,7 @@ class ProductSearch
         SearchResultInterface $searchResult,
         array $attributes = [],
         array $args //simiconnector changing
-    ): SearchResultsInterface
-    {
+    ): SearchResultsInterface {
         /** @var Collection $collection */
         // $collection = $this->collectionFactory->create();
 
@@ -123,9 +121,9 @@ class ProductSearch
         $collection = null;
         $helper = $this->simiProductHelper;
         $noFilter = isset($args['simiNoFilter']) && $args['simiNoFilter'];
-        $params = array(
-            'filter' => array()
-        );
+        $params = [
+            'filter' => []
+        ];
         /*
          * apply filter
          */
@@ -144,20 +142,20 @@ class ProductSearch
             if (!isset($args['sort']) || $args['sort']) {
                 $collection->setOrder('relevance', 'desc');
             }
-            $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH)));
+            $collection->setVisibility(['in' => [Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH]]);
         }
         //filter by category
         if ($args && isset($args['filter']['category_id']['eq'])) {
             $category = $this->categoryFactory->create()
                 ->load($args['filter']['category_id']['eq']);
             $collection = $category->getProductCollection();
-            $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH)));
+            $collection->setVisibility(['in' => [Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH]]);
             $helper->category = $category;
-        } else if (!$is_search || !$collection) {
+        } elseif (!$is_search || !$collection) {
             $category = $this->categoryFactory->create()
                 ->load($this->storeManager->getStore()->getRootCategoryId());
             $collection = $category->getProductCollection();
-            $collection->setVisibility(array('in' => array(Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH)));
+            $collection->setVisibility(['in' => [Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH]]);
         }
         $helper->builderQuery = $collection;
 
@@ -193,22 +191,22 @@ class ProductSearch
 
         //get simi_filter options
         if (!$is_details && !$noFilter && ($simiProductFilters = $helper->getLayerNavigator($collection, $params))) {
-            $simiFilterOptions = array();
+            $simiFilterOptions = [];
             if (isset($simiProductFilters['layer_filter'])) {
                 foreach ($simiProductFilters['layer_filter'] as $layer_filter) {
                     if (isset($layer_filter['filter']) && $count = count($layer_filter['filter'])) {
-                        $filtersubOptions = array();
+                        $filtersubOptions = [];
                         foreach ($layer_filter['filter'] as $filtersubOption) {
                             $filtersubOption['value_string'] = (string)$filtersubOption['value'];
                             $filtersubOption['items_count'] = (int)$filtersubOption['count'];
                             $filtersubOptions[] = $filtersubOption;
                         }
-                        $simiFilterOptions[] = array(
+                        $simiFilterOptions[] = [
                             'name' => $layer_filter['title'],
                             'filter_items_count' => $count,
                             'request_var' => $layer_filter['attribute'],
                             'filter_items' => $filtersubOptions,
-                        );
+                        ];
                     }
                 }
             }
@@ -231,19 +229,20 @@ class ProductSearch
             $collection->setCurPage($args['currentPage']);
         }
         if (isset($args['simiProductSort'])) {
-            if ($args['simiProductSort']['attribute'] == 'most_viewed')
+            if ($args['simiProductSort']['attribute'] == 'most_viewed') {
                 $this->applySimiViewCountSort($collection, $args['simiProductSort']['direction']);
-            elseif ($args['simiProductSort']['attribute'] == 'top_rated')
+            } elseif ($args['simiProductSort']['attribute'] == 'top_rated') {
                 $this->applySimiTopRatedSort($collection, $args['simiProductSort']['direction']);
-            else
+            } else {
                 $collection->setOrder($args['simiProductSort']['attribute'], $args['simiProductSort']['direction']);
-        } else if (isset($args['sort'])) {
+            }
+        } elseif (isset($args['sort'])) {
             foreach ($args['sort'] as $atr => $dir) {
                 $collection->setOrder($atr, $dir);
             }
         }
 
-        $items = array();
+        $items = [];
         foreach ($collection->getData() as $index => $product) {
             $items[(int)$product['entity_id']] = $this->productFactory->create()
                 ->load($product['entity_id']);
@@ -279,10 +278,10 @@ class ProductSearch
             'review_entity_summary',
             'rating_summary',
             'entity_pk_value=entity_id',
-            array(
+            [
                 'entity_type' => 1,
                 'store_id' => $this->storeManager->getStore()->getId()
-            ),
+            ],
             'left'
         );
         $collection->getSelect()->order('rating_summary ' . $dir);
@@ -315,5 +314,4 @@ class ProductSearch
             ]
         );
     }
-
 }

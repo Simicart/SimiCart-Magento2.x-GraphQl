@@ -20,8 +20,7 @@ class ContactUsResolver implements ResolverInterface
      */
     public function __construct(
         SimiContactUsDataprovider $contactUsDataProvider
-    )
-    {
+    ) {
         $this->contactUsDataProvider = $contactUsDataProvider;
     }
 
@@ -34,8 +33,7 @@ class ContactUsResolver implements ResolverInterface
         ResolveInfo $info,
         array $value = null,
         array $args = null
-    )
-    {
+    ) {
         if (!isset($args['input'])) {
             throw new GraphQlInputException(__('Specify the "input" value.'));
         }
@@ -44,6 +42,5 @@ class ContactUsResolver implements ResolverInterface
         } catch (LocalizedException $e) {
             throw new GraphQlInputException(__($e->getMessage()), $e);
         }
-
     }
 }

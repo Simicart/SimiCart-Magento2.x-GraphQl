@@ -30,8 +30,7 @@ class GraphQlPlugin
         \Magento\Framework\TranslateInterface $translation,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Magento\Store\Model\StoreManagerInterface $storeManager
-    )
-    {
+    ) {
         $this->areaList = $areaList;
         $this->appState = $appState;
         $this->translation = $translation;
