@@ -278,9 +278,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $arrayIDs[$allProductId] = '1';
         }
         $layerFilters = [];
-
-        $titleFilters = [];
-        $this->_filterByAtribute($collection, $attributeCollection, $titleFilters, $layerFilters, $arrayIDs);
+        $this->_filterByAtribute($collection, $attributeCollection, $layerFilters, $arrayIDs);
 
         /**
          * Uncomment the lines below to bring back the price filter
@@ -294,7 +292,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->_filterByPriceRange($layerFilters, $parentAndChildCollection, $params);
             }
         }
-        */
+         */
 
         // category
         if ($this->category) {
@@ -400,7 +398,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         return $selectableFilters;
     }
 
-    public function _filterByAtribute($collection, $attributeCollection, &$titleFilters, &$layerFilters, $arrayIDs)
+    public function _filterByAtribute($collection, $attributeCollection, &$layerFilters, $arrayIDs)
     {
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
@@ -418,7 +416,17 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $attributeOptions = [];
             //get value from child is going to cause wrong count value
             $toGetValueFromChild = ($attributeCode == 'color' || $attributeCode == 'size');
+            /**
+             * Change to:
+             * $idArrayToFilter = $toGetValueFromChild ? $this->beforeApplyFilterChildAndParentIds : $this->beforeApplyFilterParentIds;
+             * if you want to get available filter options not depends on filtered products
+             */
             $idArrayToFilter = $toGetValueFromChild ? $childAndParentIds : $parentIds;
+            /**
+             * Change to
+             * $filteredAbove = false;
+             * if you want to get available filter options base on the result that included itself
+             */
             $filteredAbove = isset($this->filteredAttributes[$attributeCode]);
             if ($filteredAbove) {
                 $idArrayToFilter = $toGetValueFromChild ? $this->beforeApplyFilterChildAndParentIds : $this->beforeApplyFilterParentIds;
@@ -446,9 +454,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             }
 
             $attributeValues = $this->getAllAttributeValues($attributeCode, $collection, $idArrayToFilter);
-            if (in_array($attribute->getDefaultFrontendLabel(), $titleFilters)) {
-                continue;
-            }
             foreach ($attributeValues as $productId => $optionIds) {
                 if (
                     isset($optionIds[0]) &&
@@ -481,7 +486,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
             if (count($filters) >= 1) {
-                $titleFilters[] = $attribute->getDefaultFrontendLabel();
                 $layerFilters[] = [
                     'attribute' => $attribute->getAttributeCode(),
                     'title' => $attribute->getDefaultFrontendLabel(),
@@ -496,10 +500,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $priceRanges = $this->_getPriceRanges($collection);
         $filters     = [];
         $totalCount  = 0;
-        $maxIndex    = 0;
-        if ($this->simiObjectManager->get('Simi\Simiconnector\Helper\Data')->countArray($priceRanges['counts']) > 0) {
-            $maxIndex = max(array_keys($priceRanges['counts']));
-        }
         $countArr = $priceRanges['counts'];
         ksort($countArr);
         foreach ($countArr as $index => $count) {
@@ -526,11 +526,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 ];
             }
         }
-        if (
-            $this->simiObjectManager
-            ->get('Simi\Simiconnector\Helper\Data')
-            ->countArray($filters) >= 1
-        ) {
+        if (count($filters) >= 1) {
             $priceAttributes = $this->simiObjectManager->get('\Magento\Eav\Model\Config')->getAttribute('catalog_product', 'price');
             $layerFilters[] = [
                 'attribute' => 'price',
@@ -600,7 +596,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
-
     /**
      * Return all attribute values as array in form:
      * array(
@@ -648,13 +643,27 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
 
+    /**
+     * Return child ids from parent id
+     * array(
+     *   [entity_id] => '1',
+     *   ...
+     * )
+     *
+     * @param array $arrayIDs parent id
+     * array(
+     *   [entity_id] => '1',
+     *   ...
+     * )
+     * @param Magento\Catalog\Model\ResourceModel\Product\Interceptor $resource
+     * @return array
+     */
     protected function getChildrenIdsFromParentIds($arrayIDs, $resource)
     {
         $childProductsIds = [];
         if ($arrayIDs && count($arrayIDs)) {
             //configurable products
-            $childProducts = $this->productCollectionFactory->create()
-                ->addAttributeToSelect('*');
+            $childProducts = $this->productCollectionFactory->create();
             $select = $childProducts->getSelect();
             $select->joinLeft(
                 array('link_table' => $resource->getTable('catalog_product_super_link')),
