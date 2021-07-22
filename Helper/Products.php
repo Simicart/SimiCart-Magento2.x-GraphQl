@@ -15,7 +15,6 @@ use Magento\Catalog\Api\Data\ProductInterface;
 
 class Products extends \Magento\Framework\App\Helper\AbstractHelper
 {
-
     public $simiObjectManager;
     public $storeManager;
     public $builderQuery;
@@ -144,21 +143,13 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->beforeApplyFilterArrayIds = $arrayIDs;
         $this->beforeApplyFilterChildProductsIds = $childProductsIds;
         $this->beforeApplyFilterChildAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
-        $childAndParentCollection = $this->productCollectionFactory->create()
-            ->addAttributeToSelect('*')
-            ->addStoreFilter()
-            ->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterChildAndParentIds])
-            ->addFieldToFilter('status', 1);
+        $childAndParentCollection = $this->createCollectionFromIds($this->beforeApplyFilterChildAndParentIds);
         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
         $this->beforeApplyFilterChildAndParentIds = $childAndParentCollection->getAllIds();
         //end
         $pIdsToFilter = $allProductIds;
         foreach ($params['filter']['layer'] as $key => $value) {
-            $newCollection = $this->productCollectionFactory->create()
-                ->addAttributeToSelect('*')
-                ->addStoreFilter()
-                ->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterChildAndParentIds])
-                ->addFieldToFilter('status', 1);
+            $newCollection = $this->createCollectionFromIds($this->beforeApplyFilterChildAndParentIds);
             if ($key == 'price') {
                 $currencyCodeFrom = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
                 $currencyCodeTo = $this->storeManager->getStore()->getBaseCurrency()->getCode();
@@ -187,11 +178,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->filteredAttributes[$key] = $value;
                     # code...
                     $productIds = [];
-                    $collectionChid = $this->productCollectionFactory->create();
-                    $collectionChid->addAttributeToSelect('*')
-                        ->addStoreFilter()
-                        ->addAttributeToFilter('status', 1);
-                    $collectionChid->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterChildAndParentIds]);
+                    $collectionChid = $this->createCollectionFromIds($this->beforeApplyFilterChildAndParentIds);
                     $collectionChid->addFinalPrice();
                     if (is_array($value)) {
                         $insetArray = array();
@@ -402,11 +389,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
-        $childAndParentCollection = $this->productCollectionFactory->create()
-            ->addAttributeToSelect('*')
-            ->addStoreFilter()
-            ->addFieldToFilter('entity_id', ['in' => $childAndParentIds])
-            ->addFieldToFilter('status', 1);
+        $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
         $childAndParentIds = $childAndParentCollection->getAllIds();
         $parentIds = array_keys($arrayIDs);
@@ -443,11 +426,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                     $childProductsIds = $this->getChildrenIdsFromParentIds($filtredArrayIDs, $collection->getResource());
                     $childAndParentIds = array_merge(array_keys($childProductsIds), $idArrayToFilter);
-                    $childAndParentCollection = $this->productCollectionFactory->create()
-                        ->addAttributeToSelect('*')
-                        ->addStoreFilter()
-                        ->addFieldToFilter('entity_id', ['in' => $childAndParentIds])
-                        ->addFieldToFilter('status', 1);
+                    $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
                     $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
                     $idArrayToFilter = $childAndParentCollection->getAllIds();
                 }
@@ -675,58 +654,77 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             foreach ($childProducts->getAllIds() as $allProductId) {
                 $childProductsIds[$allProductId] = '1';
             }
-            //bundle products
-            $connection = $this->bundleSelection->getConnection();
-            $linkField = $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField();
-            $select = $connection->select()->from(
-                ['tbl_selection' => $this->bundleSelection->getMainTable()],
-                ['product_id', 'parent_product_id', 'option_id']
-            )->join(
-                ['e' => $resource->getTable('catalog_product_entity')],
-                'e.entity_id = tbl_selection.product_id AND e.required_options=0',
-                []
-            )->join(
-                ['parent' => $resource->getTable('catalog_product_entity')],
-                'tbl_selection.parent_product_id = parent.' . $linkField
-            )->join(
-                ['tbl_option' => $resource->getTable('catalog_product_bundle_option')],
-                'tbl_option.option_id = tbl_selection.option_id',
-                ['required']
-            )->where(
-                'parent.entity_id IN (' . implode(',', array_keys($arrayIDs)) . ')'
-            );
-            foreach ($connection->fetchAll($select) as $row) {
-                if (isset($row['product_id']))
-                    $childProductsIds[$row['product_id']] = '1';
-            }
-            //grouped products
-            $connection = $this->groupedProductLink->getConnection();
-            $bind = [':link_type_id' => GroupedProductLink::LINK_TYPE_GROUPED];
-            $select = $connection->select()->from(
-                ['l' => $this->groupedProductLink->getMainTable()],
-                ['linked_product_id']
-            )->join(
-                ['cpe' => $this->groupedProductLink->getTable('catalog_product_entity')],
-                sprintf(
-                    'cpe.%s = l.product_id',
-                    $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField()
-                )
-            )->where(
-                'cpe.entity_id IN (' . implode(',', array_keys($arrayIDs)) . ')'
-            )->where(
-                'link_type_id = :link_type_id'
-            );
+            /**
+             * bundle products
+             * uncomment this if you want to get available filter options base on children of bundle product
+             */
+            // $connection = $this->bundleSelection->getConnection();
+            // $linkField = $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField();
+            // $select = $connection->select()->from(
+            //     ['tbl_selection' => $this->bundleSelection->getMainTable()],
+            //     ['product_id', 'parent_product_id', 'option_id']
+            // )->join(
+            //     ['e' => $resource->getTable('catalog_product_entity')],
+            //     'e.entity_id = tbl_selection.product_id AND e.required_options=0',
+            //     []
+            // )->join(
+            //     ['parent' => $resource->getTable('catalog_product_entity')],
+            //     'tbl_selection.parent_product_id = parent.' . $linkField
+            // )->join(
+            //     ['tbl_option' => $resource->getTable('catalog_product_bundle_option')],
+            //     'tbl_option.option_id = tbl_selection.option_id',
+            //     ['required']
+            // )->where(
+            //     'parent.entity_id IN (' . implode(',', array_keys($arrayIDs)) . ')'
+            // );
+            // foreach ($connection->fetchAll($select) as $row) {
+            //     if (isset($row['product_id']))
+            //         $childProductsIds[$row['product_id']] = '1';
+            // }
 
-            $select->join(
-                ['e' => $this->groupedProductLink->getTable('catalog_product_entity')],
-                'e.entity_id = l.linked_product_id AND e.required_options = 0',
-                []
-            );
-            foreach ($connection->fetchAll($select, $bind) as $row) {
-                if (isset($row['linked_product_id']))
-                    $childProductsIds[$row['linked_product_id']] = '1';
-            }
+            /**
+             * grouped products
+             * uncomment this if you want to get available filter options base on children of grouped product
+             */
+            // $connection = $this->groupedProductLink->getConnection();
+            // $bind = [':link_type_id' => GroupedProductLink::LINK_TYPE_GROUPED];
+            // $select = $connection->select()->from(
+            //     ['l' => $this->groupedProductLink->getMainTable()],
+            //     ['linked_product_id']
+            // )->join(
+            //     ['cpe' => $this->groupedProductLink->getTable('catalog_product_entity')],
+            //     sprintf(
+            //         'cpe.%s = l.product_id',
+            //         $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField()
+            //     )
+            // )->where(
+            //     'cpe.entity_id IN (' . implode(',', array_keys($arrayIDs)) . ')'
+            // )->where(
+            //     'link_type_id = :link_type_id'
+            // );
+
+            // $select->join(
+            //     ['e' => $this->groupedProductLink->getTable('catalog_product_entity')],
+            //     'e.entity_id = l.linked_product_id AND e.required_options = 0',
+            //     []
+            // );
+            // foreach ($connection->fetchAll($select, $bind) as $row) {
+            //     if (isset($row['linked_product_id']))
+            //         $childProductsIds[$row['linked_product_id']] = '1';
+            // }
         }
         return $childProductsIds;
+    }
+
+    /**
+     * Create collection from ids
+     */
+    protected function createCollectionFromIds($pIds)
+    {
+        return $this->productCollectionFactory->create()
+            ->addAttributeToSelect('*')
+            ->addStoreFilter()
+            ->addFieldToFilter('entity_id', ['in' => $pIds])
+            ->addFieldToFilter('status', 1);
     }
 }
