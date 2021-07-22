@@ -420,7 +420,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
-        $childAndParentCollection = $this->productCollectionFactory->create()->addFieldToFilter('entity_id', ['in' => $childAndParentIds])
+        $childAndParentCollection = $this->productCollectionFactory->create()
+            ->addAttributeToSelect('*')
+            ->addStoreFilter()
+            ->addFieldToFilter('entity_id', ['in' => $childAndParentIds])
             ->addFieldToFilter('status', 1);
         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
         $childAndParentIds = $childAndParentCollection->getAllIds();
