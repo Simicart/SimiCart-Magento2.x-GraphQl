@@ -183,17 +183,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                     $this->filteredAttributes[$key] = $value;
                     $newCollection->addCategoriesFilter(['in' => $value]);
-                } elseif ($key !== 'color' && $key !== 'size') {
-                    //no need to filter by child products if not size or color (to optimize)
-                    $this->filteredAttributes[$key] = $value;
-                    if (is_array($value)) {
-                        $insetArray = array();
-                        foreach ($value as $child_value) {
-                            $insetArray[] = array('finset' => array($child_value));
-                        }
-                        $newCollection->addAttributeToFilter($key, $insetArray);
-                    } else
-                        $newCollection->addAttributeToFilter($key, ['finset' => $value]);
                 } else {
                     $this->filteredAttributes[$key] = $value;
                     # code...
@@ -219,10 +208,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                             array('product_id', 'parent_id')
                         );
                     try {
-                        /**
-                         * uncomment closure below to filter by bundle child, will make filtering slower
-                         */
-                        /**
                         foreach ($collectionChid as $product) {
                             // check for group products
                             if (
@@ -241,8 +226,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                                 $productIds = array_merge($productIds, $this->bundleType->getParentIdsByChild($product->getId()));
                             }
                             $productIds[] = $product->getParentId() ? $product->getParentId() : $product->getId();
-                        } 
-                         */
+                        }
                         foreach ($collectionChid as $product) {
                             $productIds[] = $product->getParentId();
                         }
@@ -438,10 +422,26 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $filteredAbove = isset($this->filteredAttributes[$attributeCode]);
             if ($filteredAbove) {
                 $idArrayToFilter = $toGetValueFromChild ? $this->beforeApplyFilterChildAndParentIds : $this->beforeApplyFilterParentIds;
+                $filteredOtherAttribute = false;
                 foreach ($this->pIdsFiltedByKey as $key => $pIdsFiltedByKey) {
                     if ($key !== $attributeCode) {
+                        $filteredOtherAttribute = true;
                         $idArrayToFilter = array_intersect($idArrayToFilter, $pIdsFiltedByKey);
                     }
+                }
+                if ($filteredOtherAttribute && $toGetValueFromChild) {
+                    foreach ($idArrayToFilter as $idArrayItm) {
+                        $filtredArrayIDs[$idArrayItm] = '1';
+                    }
+                    $childProductsIds = $this->getChildrenIdsFromParentIds($filtredArrayIDs, $collection->getResource());
+                    $childAndParentIds = array_merge(array_keys($childProductsIds), $idArrayToFilter);
+                    $childAndParentCollection = $this->productCollectionFactory->create()
+                        ->addAttributeToSelect('*')
+                        ->addStoreFilter()
+                        ->addFieldToFilter('entity_id', ['in' => $childAndParentIds])
+                        ->addFieldToFilter('status', 1);
+                    $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+                    $idArrayToFilter = $childAndParentCollection->getAllIds();
                 }
             }
 
