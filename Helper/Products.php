@@ -40,6 +40,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     public $groupType;
     public $currencyFactory;
     public $pIdsFiltedByKey = [];
+    public $connectorHelper;
+    public $showOutOfStock;
 
     const XML_PATH_RANGE_STEP = 'catalog/layered_navigation/price_range_step';
     const MIN_RANGE_POWER = 10;
@@ -64,6 +66,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         MetadataPool $metadataPool,
         GroupedType $groupType,
         BundleType $bundleType,
+        \Simi\Simiconnector\Helper\Data $connectorHelper,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory
     ) {
 
@@ -86,6 +89,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->groupType = $groupType;
         $this->bundleType = $bundleType;
         $this->currencyFactory = $currencyFactory;
+        $this->connectorHelper = $connectorHelper;
+        $this->showOutOfStock = $this->connectorHelper->getStoreConfig('cataloginventory/options/show_out_of_stock');
         parent::__construct($context);
     }
 
@@ -144,7 +149,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->beforeApplyFilterChildProductsIds = $childProductsIds;
         $this->beforeApplyFilterChildAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->createCollectionFromIds($this->beforeApplyFilterChildAndParentIds);
-        $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+        if (!$this->showOutOfStock) {
+            $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+        }
         $this->beforeApplyFilterChildAndParentIds = $childAndParentCollection->getAllIds();
         //end
         $pIdsToFilter = $allProductIds;
@@ -392,7 +399,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
-        $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+        if (!$this->showOutOfStock) {
+            $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+        }
         $childAndParentIds = $childAndParentCollection->getAllIds();
         $parentIds = array_keys($arrayIDs);
         $this->afterFilterChildAndParentIds = $childAndParentIds;
@@ -428,8 +437,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                     $childProductsIds = $this->getChildrenIdsFromParentIds($filtredArrayIDs, $collection->getResource());
                     $childAndParentIds = array_merge(array_keys($childProductsIds), $idArrayToFilter);
-                    $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
-                    $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+                    $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);        
+                    if (!$this->showOutOfStock) {
+                        $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+                    }
                     $idArrayToFilter = $childAndParentCollection->getAllIds();
                 }
             }
