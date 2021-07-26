@@ -65,18 +65,20 @@ class Banner implements ResolverInterface {
 				*/
 
 				//BP is represent for basic path, direct to the root of the folder, in this case it is : /var/www/html/magento2, this return all the attribute of the image
-				$imageAttribute   = getimagesize( BP . '/pub/media/' . $returnbanner[ $i ]['banner_name'] );
+				if (isset($returnbanner[ $i ]['banner_name']) && $returnbanner[ $i ]['banner_name']) {
+					$imageAttribute   = getimagesize( BP . '/pub/media/' . $returnbanner[ $i ]['banner_name'] );
+				}
 				$bannerUrl        = null;
 				$bannernametablet = null;
 				try {
-					if ( $returnbanner[ $i ]['banner_name'] ) {
+					if (isset($returnbanner[ $i ]['banner_name']) && $returnbanner[ $i ]['banner_name'] ) {
 						$imagesize                    = getimagesize( BP . '/pub/media/' . $returnbanner[ $i ]['banner_name'] );
 						$returnbanner[ $i ]['width']  = $imagesize[0];
 						$returnbanner[ $i ]['height'] = $imagesize[1];
 						$bannername                   = str_replace( "Simiconnector", "", $returnbanner[ $i ]["banner_name"] );
 						$bannerUrl                    = $this->imageHelper->getBaseUrl() . $bannername;
 					}
-					if ( $returnbanner[ $i ]['banner_name_tablet'] ) {
+					if (isset($returnbanner[ $i ]['banner_name_tablet']) && $returnbanner[ $i ]['banner_name_tablet'] ) {
 						$imagesize                           = getimagesize( BP . '/pub/media/' . $returnbanner[ $i ]['banner_name_tablet'] );
 						$returnbanner[ $i ]['width_tablet']  = $imagesize[0];
 						$returnbanner[ $i ]['height_tablet'] = $imagesize[1];
@@ -86,7 +88,7 @@ class Banner implements ResolverInterface {
 						$bannernametablet = $bannerUrl;
 					}
 				}
-				catch ( \Exception $e ) {
+                catch ( \Exception $e ) {
 					$returnbanner[ $i ]['function_warning'] = true;
 				}
 
