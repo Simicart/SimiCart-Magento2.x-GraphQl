@@ -150,8 +150,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->beforeApplyFilterChildProductsIds = $childProductsIds;
         $this->beforeApplyFilterChildAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->createCollectionFromIds($this->beforeApplyFilterChildAndParentIds);
-        if (!$this->showOutOfStock)
+        if (!$this->showOutOfStock) {
             $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+        }
         $this->beforeApplyFilterChildAndParentIds = $childAndParentCollection->getAllIds();
         //end
         $pIdsToFilter = $allProductIds;
@@ -207,16 +208,14 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     try {
                         foreach ($collectionChid as $product) {
                             // check for group products
-                            if (
-                                $this->groupType->getParentIdsByChild($product->getId())
+                            if ($this->groupType->getParentIdsByChild($product->getId())
                                 && is_array($this->groupType->getParentIdsByChild($product->getId()))
                                 && count($this->groupType->getParentIdsByChild($product->getId()))
                             ) {
                                 $productIds = array_merge($productIds, $this->groupType->getParentIdsByChild($product->getId()));
                             }
                             // check for bundle products
-                            if (
-                                $this->bundleType->getParentIdsByChild($product->getId())
+                            if ($this->bundleType->getParentIdsByChild($product->getId())
                                 && is_array($this->bundleType->getParentIdsByChild($product->getId()))
                                 && count($this->bundleType->getParentIdsByChild($product->getId()))
                             ) {
@@ -401,8 +400,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
-        if (!$this->showOutOfStock)
+        if (!$this->showOutOfStock) {
             $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+        }
         $childAndParentIds = $childAndParentCollection->getAllIds();
         $parentIds = array_keys($arrayIDs);
         $this->afterFilterChildAndParentIds = $childAndParentIds;
@@ -439,16 +439,16 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     $childProductsIds = $this->getChildrenIdsFromParentIds($filtredArrayIDs, $collection->getResource());
                     $childAndParentIds = array_merge(array_keys($childProductsIds), $idArrayToFilter);
                     $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
-                    if (!$this->showOutOfStock)
+                    if (!$this->showOutOfStock) {
                         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
+                    }
                     $idArrayToFilter = $childAndParentCollection->getAllIds();
                 }
             }
 
             $attributeValues = $this->getAllAttributeValues($attributeCode, $collection, $idArrayToFilter);
             foreach ($attributeValues as $productId => $optionIds) {
-                if (
-                    isset($optionIds[0]) &&
+                if (isset($optionIds[0]) &&
                     (
                         (isset($this->beforeApplyFilterArrayIds[$productId]) &&
                             ($this->beforeApplyFilterArrayIds[$productId] != null)) ||
@@ -469,8 +469,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $options = $attribute->getSource()->getAllOptions();
             $filters = [];
             foreach ($options as $option) {
-                if (
-                    isset($option['value']) && isset($attributeOptions[$option['value']])
+                if (isset($option['value']) && isset($attributeOptions[$option['value']])
                     && $attributeOptions[$option['value']]
                 ) {
                     $option['count'] = $attributeOptions[$option['value']];
