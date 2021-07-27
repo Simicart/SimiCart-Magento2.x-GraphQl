@@ -90,7 +90,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->bundleType = $bundleType;
         $this->currencyFactory = $currencyFactory;
         $this->connectorHelper = $connectorHelper;
-        $this->showOutOfStock = $this->connectorHelper->getStoreConfig('cataloginventory/options/show_out_of_stock');
+        $this->showOutOfStock = $this->connectorHelper
+            ->getStoreConfig('cataloginventory/options/show_out_of_stock');
         parent::__construct($context);
     }
 
@@ -149,9 +150,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->beforeApplyFilterChildProductsIds = $childProductsIds;
         $this->beforeApplyFilterChildAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->createCollectionFromIds($this->beforeApplyFilterChildAndParentIds);
-        if (!$this->showOutOfStock) {
+        if (!$this->showOutOfStock)
             $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
-        }
         $this->beforeApplyFilterChildAndParentIds = $childAndParentCollection->getAllIds();
         //end
         $pIdsToFilter = $allProductIds;
@@ -166,8 +166,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 if (isset($value[0]) && isset($value[1])) {
                     $priceFrom = $value[0] / $rate;
                     $priceTo   = $value[1] / $rate;
-                    $collection->getSelect()->where("price_index.final_price > " . $priceFrom)
-                        ->where("price_index.final_price < " . $priceTo);
+                    $newCollection->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterParentIds]);
+                    $newCollection->addPriceData();
+                    $newCollection->getSelect()->where("price_index.min_price > " . $priceFrom)
+                        ->where("price_index.min_price < " . $priceTo);
                 }
             } else {
                 if ($key == 'category_id') {
@@ -205,14 +207,16 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     try {
                         foreach ($collectionChid as $product) {
                             // check for group products
-                            if ($this->groupType->getParentIdsByChild($product->getId())
+                            if (
+                                $this->groupType->getParentIdsByChild($product->getId())
                                 && is_array($this->groupType->getParentIdsByChild($product->getId()))
                                 && count($this->groupType->getParentIdsByChild($product->getId()))
                             ) {
                                 $productIds = array_merge($productIds, $this->groupType->getParentIdsByChild($product->getId()));
                             }
                             // check for bundle products
-                            if ($this->bundleType->getParentIdsByChild($product->getId())
+                            if (
+                                $this->bundleType->getParentIdsByChild($product->getId())
                                 && is_array($this->bundleType->getParentIdsByChild($product->getId()))
                                 && count($this->bundleType->getParentIdsByChild($product->getId()))
                             ) {
@@ -237,8 +241,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                         }
                     }
                 }
-                $this->pIdsFiltedByKey[$key] = $newCollection->getAllIds();
             }
+            $this->pIdsFiltedByKey[$key] = $newCollection->getAllIds();
         }
         foreach ($this->pIdsFiltedByKey as $pIdsFiltedByKey) {
             $pIdsToFilter = array_intersect($pIdsToFilter, $pIdsFiltedByKey);
@@ -279,13 +283,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
          * Uncomment the lines below to bring back the price filter
          * */
         /**
-        if (!(!empty($params['filter']['layer']) && is_array($params['filter']['layer']) && array_key_exists('price', $params['filter']['layer']))) {
-            if ($this->afterFilterChildAndParentIds) {
-                $parentAndChildCollection = $this->productCollectionFactory->create()->addPriceData()->addFinalPrice()
-                    ->addFieldToFilter('entity_id', array('in' => $this->afterFilterChildAndParentIds))
-                    ->addAttributeToFilter('status', 1);
-                $this->_filterByPriceRange($layerFilters, $parentAndChildCollection, $params);
-            }
+        if ($this->afterFilterChildAndParentIds) {
+            $priceProductCollection = $this->createCollectionFromIds($allProductIds);
+            if (!$this->showOutOfStock)
+                $this->stockHelper->addInStockFilterToCollection($priceProductCollection);
+            $this->_filterByPriceRange($layerFilters, $priceProductCollection, $params);
         }
          */
 
@@ -399,16 +401,15 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $childProductsIds = $this->getChildrenIdsFromParentIds($arrayIDs, $collection->getResource());
         $childAndParentIds = array_merge(array_keys($childProductsIds), array_keys($arrayIDs));
         $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
-        if (!$this->showOutOfStock) {
+        if (!$this->showOutOfStock)
             $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
-        }
         $childAndParentIds = $childAndParentCollection->getAllIds();
         $parentIds = array_keys($arrayIDs);
         $this->afterFilterChildAndParentIds = $childAndParentIds;
         foreach ($attributeCollection as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
             $attributeOptions = [];
-            //get value from child is going to cause wrong count value
+            //get value from child is going to cause slower API
             $toGetValueFromChild = ($attributeCode == 'color' || $attributeCode == 'size');
             /**
              * Change to:
@@ -437,17 +438,17 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     }
                     $childProductsIds = $this->getChildrenIdsFromParentIds($filtredArrayIDs, $collection->getResource());
                     $childAndParentIds = array_merge(array_keys($childProductsIds), $idArrayToFilter);
-                    $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);        
-                    if (!$this->showOutOfStock) {
+                    $childAndParentCollection = $this->createCollectionFromIds($childAndParentIds);
+                    if (!$this->showOutOfStock)
                         $this->stockHelper->addInStockFilterToCollection($childAndParentCollection);
-                    }
                     $idArrayToFilter = $childAndParentCollection->getAllIds();
                 }
             }
 
             $attributeValues = $this->getAllAttributeValues($attributeCode, $collection, $idArrayToFilter);
             foreach ($attributeValues as $productId => $optionIds) {
-                if (isset($optionIds[0]) &&
+                if (
+                    isset($optionIds[0]) &&
                     (
                         (isset($this->beforeApplyFilterArrayIds[$productId]) &&
                             ($this->beforeApplyFilterArrayIds[$productId] != null)) ||
@@ -468,7 +469,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $options = $attribute->getSource()->getAllOptions();
             $filters = [];
             foreach ($options as $option) {
-                if (isset($option['value']) && isset($attributeOptions[$option['value']])
+                if (
+                    isset($option['value']) && isset($attributeOptions[$option['value']])
                     && $attributeOptions[$option['value']]
                 ) {
                     $option['count'] = $attributeOptions[$option['value']];
@@ -541,7 +543,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $counts = [];
         do {
             $range = pow(10, strlen(floor($maxPrice)) - $index);
-            $counts = $collection->getAttributeValueCountByRange('price', $range);
+            $counts = $this->getPriceCountByRange($range, $collection);
             $index++;
         } while ($range > self::MIN_RANGE_POWER && count($counts) < 2 && $index <= 2);
 
@@ -737,5 +739,38 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             ->addStoreFilter()
             ->addFieldToFilter('entity_id', ['in' => $pIds])
             ->addFieldToFilter('status', 1);
+    }
+
+    /**
+     * Retrieve ranging product count for arrtibute range
+     *
+     * @param int $range
+     * @param Magento\Catalog\Model\ResourceModel\Product\Collection $collection product collection
+     * @return array
+     */
+    public function getPriceCountByRange($range, $collection)
+    {
+        $select = clone $collection->getSelect();
+        $select->reset(\Magento\Framework\DB\Select::GROUP);
+        $select->join(
+            [null],
+            null,
+            [
+                'count_price' => new \Zend_Db_Expr('COUNT(DISTINCT e.entity_id)'),
+                'range_price' => new \Zend_Db_Expr('CEIL((price_index.min_price+0.01)/' . $range . ')')
+            ]
+        )
+            ->group(
+                'range_price'
+            );
+
+        $data = $collection->getConnection()->fetchAll($select);
+        $res = [];
+
+        foreach ($data as $row) {
+            $res[$row['range_price']] = $row['count_price'];
+        }
+
+        return $res;
     }
 }
