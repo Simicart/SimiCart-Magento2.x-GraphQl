@@ -169,7 +169,7 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     $priceTo   = $value[1] / $rate;
                     $newCollection->addFieldToFilter('entity_id', ['in' => $this->beforeApplyFilterParentIds]);
                     $newCollection->addPriceData();
-                    $newCollection->getSelect()->where("price_index.min_price > " . $priceFrom)
+                    $newCollection->getSelect()->where("price_index.min_price >= " . $priceFrom)
                         ->where("price_index.min_price < " . $priceTo);
                 }
             } else {
