@@ -267,7 +267,9 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         ;
         //$attributeCollection->addFieldToFilter('attribute_code', ['nin' => ['price']]);
         if ($this->is_search) {
-            $attributeCollection->addFieldToFilter('is_filterable_in_search', 1);
+            //there's an error on Magento 2.4.3 that make all attribute not visible in search, uncomment this on earlier version
+            //or on later version that fixed the issue
+            //$attributeCollection->addFieldToFilter('is_filterable_in_search', 1);
         }
 
         $allProductIds = $collection->getAllIds();
