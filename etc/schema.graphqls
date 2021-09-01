@@ -173,6 +173,8 @@ type SimiStoreConfigDetailsSales {
     sales_totals_sort_grand_total : String
     sales_minimum_order_active: String
     sales_minimum_order_amount: String
+    sales_minimum_order_description: String
+    sales_minimum_order_error_message: String
 }
 
 type SimiStoreConfigDetailsCheckout {
