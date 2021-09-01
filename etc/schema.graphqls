@@ -347,6 +347,7 @@ type SimiCatalogInventoryConfig {
 }
 
 type SimiCatalogReviewConfig {
+    catalog_review_active : String
     catalog_review_allow_guest : String
 }
 

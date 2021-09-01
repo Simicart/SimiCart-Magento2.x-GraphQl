@@ -264,6 +264,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                         ->getStoreConfig('cataloginventory/item_options/auto_return'),
                 ],
                 'review' => [
+                    'catalog_review_active' => $this->getStoreConfig('catalog/review/active'),
                     'catalog_review_allow_guest' => $this->getStoreConfig('catalog/review/allow_guest'),
                 ]
             ],
