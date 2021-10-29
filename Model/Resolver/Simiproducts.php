@@ -161,40 +161,40 @@ class Simiproducts implements ResolverInterface
                             ->getProductReviews($productModel->getId())
                     )*/
                     ;
-                    $this->currentProductModel = $productModel;
-                    $this->eventManager->dispatch(
-                        'simi_simiconnector_graphql_simi_product_list_item_after',
-                        ['object' => $this, 'extraData' => $this->productExtraData]
-                    );
+                    // $this->currentProductModel = $productModel;
+                    // $this->eventManager->dispatch(
+                    //     'simi_simiconnector_graphql_simi_product_list_item_after',
+                    //     ['object' => $this, 'extraData' => $this->productExtraData]
+                    // );
                     $product['simiExtraField'] = json_encode($this->productExtraData);
                     $products[$index] = $product;
                 } else { //details
-                    $registry = $this->registry;
-                    if (!$registry->registry('product') && $productModel->getId()) {
-                        $registry->register('product', $productModel);
-                        $registry->register('current_product', $productModel);
-                    }
+                    // $registry = $this->registry;
+                    // if (!$registry->registry('product') && $productModel->getId()) {
+                    //     $registry->register('product', $productModel);
+                    //     $registry->register('current_product', $productModel);
+                    // }
 
                     /*$app_reviews  = $this->simiReviewHelper
                         ->getProductReviews($productModel->getId());*/
 
-                    $layout = $this->simiLayout;
-                    $block_att = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
-                    $_additional = $block_att->getAdditionalData();
+                    // $layout = $this->simiLayout;
+                    // $block_att = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
+                    // $_additional = $block_att->getAdditionalData();
 
                     /*$tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);*/
 
                     $this->extraFields = [
                         /*'attribute_values' => $productModel->toArray(),
                         'app_reviews' => $app_reviews,*/
-                        'additional' => $_additional,
+                        //'additional' => $_additional,
                         /*'app_tier_prices' => $tierPrice,*/
                     ];
-                    $this->currentProductModel = $productModel;
-                    $this->eventManager->dispatch(
-                        'simi_simiconnector_graphql_product_detail_extra_field_after',
-                        ['object' => $this, 'data' => $this->extraFields]
-                    );
+                    // $this->currentProductModel = $productModel;
+                    // $this->eventManager->dispatch(
+                    //     'simi_simiconnector_graphql_product_detail_extra_field_after',
+                    //     ['object' => $this, 'data' => $this->extraFields]
+                    // );
                     $product['simiExtraField'] = json_encode($this->extraFields);
                     $products[$index] = $product;
                 }

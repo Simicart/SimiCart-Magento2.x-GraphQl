@@ -45,7 +45,7 @@ type Simiproducts @doc(description: "The Products object is the top-level object
 }
 
 interface ProductInterface {
-    simiExtraField: String @doc(description: "Simicart Product Extra Fields")
+    simiExtraField: String @doc(description: "Simicart Product Extra Fields") @doc(description: "Product Extra field") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Products\\SimiExtraField")
 }
 
 interface CategoryInterface {
