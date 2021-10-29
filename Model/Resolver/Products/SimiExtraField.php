@@ -13,6 +13,7 @@ use Magento\Catalog\Model\Category\FileInfo;
 use Magento\Framework\View\LayoutInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Event\ManagerInterface;
+use \Magento\Catalog\Model\ProductFactory;
 
 /**
  * @inheritdoc
@@ -28,6 +29,9 @@ class SimiExtraField implements ResolverInterface
     /** @var Registry  */
     private $registry;
 
+    /** @var ProductFactory  */
+    private $productFactory;
+
     /**
      * @param DirectoryList $directoryList
      * @param FileInfo $fileInfo
@@ -35,10 +39,12 @@ class SimiExtraField implements ResolverInterface
     public function __construct(
         Registry $registry,
         ManagerInterface $eventManager,
+        ProductFactory $productFactory,
         LayoutInterface $simiLayout
     ) {
         $this->registry = $registry;
         $this->simiLayout = $simiLayout;
+        $this->productFactory = $productFactory;
         $this->eventManager = $eventManager;
     }
     
@@ -55,15 +61,15 @@ class SimiExtraField implements ResolverInterface
         if (!isset($value['model'])) {
             throw new LocalizedException(__('"model" value should be specified'));
         }
-        /** @var \Magento\Catalog\Model\Category $category */
+        /** @var \Magento\Catalog\Model\Product $category */
         $product = $value['model'];
+        $product = $this->productFactory->create()->load($product->getId());
         $registry = $this->registry;
         $registry->register('product', $product);
         $registry->register('current_product', $product);
         $layout = $this->simiLayout;
         $block_att = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
         $_additional = $block_att->getAdditionalData();
-
         $this->extraFields = [
             'additional' => $_additional,
         ];
