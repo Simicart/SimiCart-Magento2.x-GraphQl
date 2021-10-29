@@ -119,11 +119,6 @@ class Simiproducts implements ResolverInterface
             );
         }
 
-        $is_details = false;
-        if ($args && (isset($args['filter']['url_key']['eq']) || isset($args['filter']['sku']['eq']))) {
-            $is_details = true;
-        }
-
         //get product children fields queried
         $productFields = (array)$info->getFieldSelection(1);
         $includeAggregations = isset($productFields['filters']) || isset($productFields['aggregations']);
@@ -143,63 +138,7 @@ class Simiproducts implements ResolverInterface
         //simiconnector changing
         $registry = $this->registry;
         $simiProductFilters = $registry->registry('simiProductFilters');
-
         $products = $searchResult->getProductsSearchResult();
-        $isShowOptionsInListing = $this->scopeConfig
-            ->getValue('siminiaconfig/compareconfig/show_size_in_compare');
-        foreach ($products as $index => $product) {
-            $productModel = $product['model'];
-            if ($productModel->getId()) {
-                if (!$is_details) { //listing
-                    /*$attributes = $productModel->toArray();
-                    if (isset($attributes['description']))
-                        unset($attributes['description']);*/
-
-                    $this->productExtraData = [] /*array(
-                        'attribute_values' => $attributes,
-                        'app_reviews' => $this->simiReviewHelper
-                            ->getProductReviews($productModel->getId())
-                    )*/
-                    ;
-                    // $this->currentProductModel = $productModel;
-                    // $this->eventManager->dispatch(
-                    //     'simi_simiconnector_graphql_simi_product_list_item_after',
-                    //     ['object' => $this, 'extraData' => $this->productExtraData]
-                    // );
-                    $product['simiExtraField'] = json_encode($this->productExtraData);
-                    $products[$index] = $product;
-                } else { //details
-                    // $registry = $this->registry;
-                    // if (!$registry->registry('product') && $productModel->getId()) {
-                    //     $registry->register('product', $productModel);
-                    //     $registry->register('current_product', $productModel);
-                    // }
-
-                    /*$app_reviews  = $this->simiReviewHelper
-                        ->getProductReviews($productModel->getId());*/
-
-                    // $layout = $this->simiLayout;
-                    // $block_att = $layout->createBlock('Magento\Catalog\Block\Product\View\Attributes');
-                    // $_additional = $block_att->getAdditionalData();
-
-                    /*$tierPrice   = $this->simiPriceHelper->getProductTierPricesLabel($productModel);*/
-
-                    $this->extraFields = [
-                        /*'attribute_values' => $productModel->toArray(),
-                        'app_reviews' => $app_reviews,*/
-                        //'additional' => $_additional,
-                        /*'app_tier_prices' => $tierPrice,*/
-                    ];
-                    // $this->currentProductModel = $productModel;
-                    // $this->eventManager->dispatch(
-                    //     'simi_simiconnector_graphql_product_detail_extra_field_after',
-                    //     ['object' => $this, 'data' => $this->extraFields]
-                    // );
-                    $product['simiExtraField'] = json_encode($this->extraFields);
-                    $products[$index] = $product;
-                }
-            }
-        }
 
         $this->result = [
             'total_count' => $searchResult->getTotalCount(),
