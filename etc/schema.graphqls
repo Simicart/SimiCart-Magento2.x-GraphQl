@@ -16,6 +16,8 @@ type Query {
     ): SimiStoreConfig @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simistoreconfigresolver") @doc(description: "The store config query")
     simiStoreGroup : [ SimiStoreGroupData ] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Simigroupresolver") @doc(description: "Manually return Store Group Data before magento provide")
     simiRootCate : CategoryTree @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\SimiRootCate") @doc(description: "Extra field to product details") @cache(cacheIdentity: "Magento\\CatalogGraphQl\\Model\\Resolver\\Category\\CategoryTreeIdentity")
+    customerOrder(order_number: String!): SimiCustomerOrderDetail @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrderDetailsResolver") @doc(description: "Get customer order details by order_number")
+    customerOrders: SimiCustomerOrders @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Orders") @doc(description: "List of customer orders") @cache(cacheable: false)
     simiBanner: [SimiBanner] @doc(description: "return the information of the banner which match the current store view") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\Banner")
     simiCategories: [SimiCategory] @doc(description: "return the information of a list of home categories") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\SimiCategory")
     simiProductlist: [SimiProductList] @doc(description: "return the information of a list of productList") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\Theme\\ProductList")
@@ -510,4 +512,80 @@ type SimiTotals {
     code: String
     value: Float
     currency: String
+}
+
+
+type SimiCustomerOrder @doc(description: "Order mapping fields") {
+    order_currency: String
+    id: ID! @doc(description: "The unique ID for a `CustomerOrder` object")
+    order_date: String! @doc(description: "The date the order was placed")
+    status: String! @doc(description: "The current status of the order")
+    number: String! @doc(description: "The order number")
+    items: [OrderItemInterface] @doc(description: "An array containing the items purchased in this order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\OrderItems")
+    total: OrderTotal @doc(description: "Contains details about the calculated totals for this order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\OrderTotal")
+    invoices: [Invoice]! @doc(description: "A list of invoices for the order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\Invoices")
+    shipments: [OrderShipment] @doc(description: "A list of shipments for the order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\Shipments")
+    credit_memos: [CreditMemo] @doc(description: "A list of credit memos") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\CreditMemos")
+    payment_methods: [OrderPaymentMethod] @doc(description: "Payment details for the order")
+    shipping_address: OrderAddress @doc(description: "The shipping address for the order")
+    billing_address: OrderAddress @doc(description: "The billing address for the order")
+    carrier: String @doc(description: "The shipping carrier for the order delivery") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\CustomerOrders\\Carrier")
+    shipping_method: String @doc(description: "The delivery method for the order")
+    comments: [SalesCommentItem] @doc(description: "Comments about the order")
+    increment_id: String @deprecated(reason: "Use the id attribute instead")
+    order_number: String! @deprecated(reason: "Use the number attribute instead")
+    created_at: String @deprecated(reason: "Use the order_date attribute instead")
+    grand_total: Float  @deprecated(reason: "Use the totals.grand_total attribute instead")
+}
+
+type SimiCustomerOrders {
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the current_page, page_info, and page_size values specified in the query")
+    total_count: Int @doc(description: "The total count of customer orders")
+    items: [SimiCustomerOrder] @doc(description: "Array of orders")
+}
+
+type SimiCustomerOrderDetail {
+    order_currency: String
+    id: ID! @doc(description: "The unique ID for a `CustomerOrder` object")
+    order_date: String! @doc(description: "The date the order was placed")
+    status: String! @doc(description: "The current status of the order")
+    number: String! @doc(description: "The order number")
+    total: OrderTotal @doc(description: "Contains details about the calculated totals for this order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\OrderTotal")
+    invoices: [Invoice]! @doc(description: "A list of invoices for the order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\Invoices")
+    shipments: [OrderShipment] @doc(description: "A list of shipments for the order") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\Shipments")
+    credit_memos: [CreditMemo] @doc(description: "A list of credit memos") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\CreditMemos")
+    payment_methods: [OrderPaymentMethod] @doc(description: "Payment details for the order")
+    carrier: String @doc(description: "The shipping carrier for the order delivery") @resolver(class: "Magento\\SalesGraphQl\\Model\\Resolver\\CustomerOrders\\Carrier")
+    comments: [SalesCommentItem] @doc(description: "Comments about the order")
+    increment_id: String @deprecated(reason: "Use the id attribute instead")
+    order_number: String! @deprecated(reason: "Use the number attribute instead")
+    created_at: String @deprecated(reason: "Use the order_date attribute instead")
+    grand_total: Float  @deprecated(reason: "Use the totals.grand_total attribute instead")
+    prices: SimiOrderTotal @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\TotalsResolver") @doc(description: "Total segment of the order totals.")
+    items: [SimiOrderItem] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\ItemsResolver") @doc(description: "Customer order items.")
+    billing_address: CustomerAddress @doc(description: "Customer order address.")
+    shipping_address: CustomerAddress @doc(description: "Customer order address.")
+    shipping_method: String @doc(description: "Customer order shipping method.")
+    payment_method: String @doc(description: "Customer order payment method title.")
+    is_virtual: Boolean @doc(description: "Customer order is virtual.")
+}
+
+type SimiOrderItem implements OrderItemInterface {
+    id: Int
+    name: String
+    url_key: String
+    image: String
+    sku: String
+    price: Float
+    qty: Int
+    discount: Float
+    row_total: Float
+}
+
+type SimiOrderTotal {
+    sub_total: Money
+    grand_total: Money
+    tax: Money
+    discount: Money
+    discounts: [Discount] @doc(description:"An array of applied discounts") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\DiscountResolver")
 }
