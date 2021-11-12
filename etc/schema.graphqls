@@ -84,7 +84,6 @@ input SimiProductSort @doc(description:"Input SimiProductSort") {
     direction: String
 }
 
-
 type SimiStoreConfig {
     store_id: String @doc(description: "Current store Id")
     currency: String @doc(description: "Current currency")
@@ -469,35 +468,6 @@ type SimiProductList @doc(description: "the type which return the ProductList in
     type_name: String @doc(description: "the type name of this product list")
 }
 
-type CustomerOrder {
-    prices: OrderTotal @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\TotalsResolver") @doc(description: "Total segment of the order totals.")
-    items: [OrderItem] @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\ItemsResolver") @doc(description: "Customer order items.")
-    billing_address: CustomerAddress @doc(description: "Customer order address.")
-    shipping_address: CustomerAddress @doc(description: "Customer order address.")
-    shipping_method: String @doc(description: "Customer order shipping method.")
-    payment_method: String @doc(description: "Customer order payment method title.")
-    is_virtual: Boolean @doc(description: "Customer order is virtual.")
-}
-
-type OrderItem @doc(description: "Customer order item.") {
-    id: Int
-    name: String
-    url_key: String
-    image: String
-    sku: String
-    price: Float
-    qty: Int
-    discount: Float
-    row_total: Float
-}
-
-type OrderTotal {
-    sub_total: Money
-    grand_total: Money
-    tax: Money
-    discount: Money
-    discounts: [Discount] @doc(description:"An array of applied discounts") @resolver(class: "Simi\\SimiconnectorGraphQl\\Model\\Resolver\\CustomerOrder\\DiscountResolver")
-}
 
 type WishlistCart {
     wishlist: Wishlist
