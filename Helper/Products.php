@@ -205,6 +205,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                             'link_table.product_id = e.entity_id',
                             ['product_id', 'parent_id']
                         );
+                    //uncomment this to speed up on customers that have no bundle/grouped products
+                    //$collectionChid->getSelect()->group('parent_id');
                     try {
                         foreach ($collectionChid as $product) {
                             // check for group products
@@ -624,10 +626,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 ['store_id', 'value']
             )->where('attribute_id = ?', (int)$attribute->getId())
             ->where('cpe.entity_id IN (?)', $childAndParentIds);
-
+        //uncomment this to speed up when you don't need the filter product count,
+        //and children have too many products with same attribute value
+        //$select->group('value');
         $data = $collection->getConnection()->fetchAll($select);
         $res = [];
-
         foreach ($data as $row) {
             $res[$row['entity_id']][$row['store_id']] = $row['value'];
         }
