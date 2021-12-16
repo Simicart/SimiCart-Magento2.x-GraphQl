@@ -5,4 +5,8 @@
         <observer name="simi_simiconnectorgraphql_customer_account_createpassword"
                   instance="Simi\SimiconnectorGraphQl\Observer\AccountCreatePasswordDispatch"/>
     </event>
+
+    <event name="catalog_category_save_after">
+        <observer name="category_flush_simi_graphql_cache" instance="Simi\SimiconnectorGraphQl\Observer\FlushStoreConfigCache"/>
+    </event>
 </config>
