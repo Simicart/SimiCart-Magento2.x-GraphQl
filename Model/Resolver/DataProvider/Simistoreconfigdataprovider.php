@@ -244,6 +244,7 @@ class Simistoreconfigdataprovider extends DataProviderInterface
                         ->getStoreConfig('siminiaconfig/footer_link/ft_title2'),
                     'footer_link' => $this
                         ->getStoreConfig('siminiaconfig/footer_link/ft_link'),
+                    'footer_block' => $this->getFooterBlock()
                 ],
                 'cataloginventory' => [
                     'cataloginventory_item_options_manage_stock' => $this
@@ -434,5 +435,15 @@ class Simistoreconfigdataprovider extends DataProviderInterface
         $dateUtc = new \DateTime("now", new \DateTimeZone("UTC"));
         $timeOffset = (int)$dateStore->format('H') - (int)$dateUtc->format('H');
         return (string)$timeOffset;
+    }
+
+    private function getFooterBlock() {
+        $blockIdentifier = $this->getStoreConfig('siminiaconfig/footer_link/footer_block');
+        $block = $this->simiObjectManager->get('Magento\CmsGraphQl\Model\Resolver\DataProvider\Block')->getBlockByIdentifier($blockIdentifier, (int)$this->storeManager->getStore()->getId());
+        if(!empty($block['content'])){
+            return $block['content'];
+        }
+
+        return null;
     }
 }

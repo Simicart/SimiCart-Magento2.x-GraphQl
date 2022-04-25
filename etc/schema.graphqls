@@ -333,6 +333,7 @@ type SimiCatalogFrontendConfig {
     footer_title1 : String
     footer_title2 : String
     footer_link : String
+    footer_block: String
 }
 
 type SimiCatalogInventoryConfig {
