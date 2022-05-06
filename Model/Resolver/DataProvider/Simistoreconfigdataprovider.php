@@ -439,6 +439,8 @@ class Simistoreconfigdataprovider extends DataProviderInterface
 
     private function getFooterBlock() {
         $blockIdentifier = $this->getStoreConfig('siminiaconfig/footer_link/footer_block');
+        if (!$blockIdentifier)
+            return null;
         $block = $this->simiObjectManager->get('Magento\CmsGraphQl\Model\Resolver\DataProvider\Block')->getBlockByIdentifier($blockIdentifier, (int)$this->storeManager->getStore()->getId());
         if(!empty($block['content'])){
             return $block['content'];
