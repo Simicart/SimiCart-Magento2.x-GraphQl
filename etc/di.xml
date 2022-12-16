@@ -21,4 +21,5 @@
     <!-- uncomment this and run `bin/magento catalog:images:resize -a` while facing issue with listing/grid product image
         <preference for="Magento\CatalogGraphQl\Model\Resolver\Product\MediaGallery\Url" type="Simi\SimiconnectorGraphQl\Override\MediaGallery\Url" />
     -->
+    <preference for="Magento\GraphQl\Controller\GraphQl" type="Simi\SimiconnectorGraphQl\Override\GraphQl" />
 </config>
