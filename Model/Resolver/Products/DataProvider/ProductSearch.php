@@ -103,7 +103,7 @@ class ProductSearch
         SearchCriteriaInterface $searchCriteria,
         SearchResultInterface $searchResult,
         array $attributes = [],
-        array $args //simiconnector changing
+        array $args = [] //simiconnector changing
     ): SearchResultsInterface {
         /** @var Collection $collection */
         // $collection = $this->collectionFactory->create();
